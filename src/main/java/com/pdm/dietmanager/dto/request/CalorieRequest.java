@@ -26,6 +26,18 @@ public class CalorieRequest {
     @NotNull(message = "목표는 필수 입력값입니다.")
     private GoalType goalType;
 
+    public static CalorieRequest of(Gender gender, int age, double height, double weight,
+                                    ActivityLevel activityLevel, GoalType goalType) {
+        CalorieRequest request = new CalorieRequest();
+        request.gender = gender;
+        request.age = age;
+        request.height = height;
+        request.weight = weight;
+        request.activityLevel = activityLevel;
+        request.goalType = goalType;
+        return request;
+    }
+
     public Gender getGender() {
         return gender;
     }
