@@ -1,6 +1,7 @@
 package com.pdm.dietmanager.service;
 
 import com.pdm.dietmanager.dto.request.CalorieRequest;
+import com.pdm.dietmanager.dto.response.CalorieResponse;
 import com.pdm.dietmanager.enums.GoalType;
 import com.pdm.dietmanager.strategy.CalorieStrategy;
 import java.util.EnumMap;
@@ -31,5 +32,24 @@ public class CalorieService {
         }
 
         return strategy.calculate(request);
+    }
+
+    public CalorieResponse calculateRecommendation(CalorieRequest request) {
+        return CalorieResponse.builder()
+                .goalType(request.getGoalType())
+                .recommendedCalories(calculateRecommendedCalories(request))
+                .dailyIntakeCalories(0)
+                .build();
+    }
+
+    public CalorieResponse compareWithDailyIntake(
+            CalorieRequest request,
+            int dailyIntakeCalories
+    ) {
+        return CalorieResponse.builder()
+                .goalType(request.getGoalType())
+                .recommendedCalories(calculateRecommendedCalories(request))
+                .dailyIntakeCalories(dailyIntakeCalories)
+                .build();
     }
 }
