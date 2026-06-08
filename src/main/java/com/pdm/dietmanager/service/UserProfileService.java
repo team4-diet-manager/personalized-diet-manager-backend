@@ -3,6 +3,7 @@ package com.pdm.dietmanager.service;
 import com.pdm.dietmanager.dto.request.UserProfileRequest;
 import com.pdm.dietmanager.dto.response.UserProfileResponse;
 import com.pdm.dietmanager.entity.UserProfile;
+import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.UserProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,7 @@ public class UserProfileService {
 
     public UserProfile findProfile(Long profileId) {
         return userProfileRepository.findById(profileId)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "사용자 프로필을 찾을 수 없습니다. profileId=" + profileId
                 ));
     }

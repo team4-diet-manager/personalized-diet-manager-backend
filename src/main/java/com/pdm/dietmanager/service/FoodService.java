@@ -2,6 +2,7 @@ package com.pdm.dietmanager.service;
 
 import com.pdm.dietmanager.dto.response.FoodResponse;
 import com.pdm.dietmanager.entity.Food;
+import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.FoodRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class FoodService {
 
     public Food findFood(Long foodId) {
         return foodRepository.findById(foodId)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "음식을 찾을 수 없습니다. foodId=" + foodId
                 ));
     }

@@ -5,6 +5,7 @@ import com.pdm.dietmanager.dto.response.MealLogResponse;
 import com.pdm.dietmanager.entity.Food;
 import com.pdm.dietmanager.entity.MealLog;
 import com.pdm.dietmanager.entity.UserProfile;
+import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.FoodRepository;
 import com.pdm.dietmanager.repository.MealLogRepository;
 import com.pdm.dietmanager.repository.UserProfileRepository;
@@ -79,21 +80,21 @@ public class MealLogService {
 
     private MealLog findMealLog(Long mealLogId) {
         return mealLogRepository.findById(mealLogId)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "식단 기록을 찾을 수 없습니다. mealLogId=" + mealLogId
                 ));
     }
 
     private UserProfile findProfile(Long profileId) {
         return userProfileRepository.findById(profileId)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "사용자 프로필을 찾을 수 없습니다. profileId=" + profileId
                 ));
     }
 
     private Food findFood(Long foodId) {
         return foodRepository.findById(foodId)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "음식을 찾을 수 없습니다. foodId=" + foodId
                 ));
     }
