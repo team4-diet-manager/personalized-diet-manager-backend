@@ -3,6 +3,7 @@ package com.pdm.dietmanager.dto.request;
 import com.pdm.dietmanager.enums.ActivityLevel;
 import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
+import com.pdm.dietmanager.entity.UserProfile;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -36,6 +37,17 @@ public class CalorieRequest {
         request.activityLevel = activityLevel;
         request.goalType = goalType;
         return request;
+    }
+
+    public static CalorieRequest from(UserProfile userProfile) {
+        return of(
+                userProfile.getGender(),
+                userProfile.getAge(),
+                userProfile.getHeight(),
+                userProfile.getWeight(),
+                userProfile.getActivityLevel(),
+                userProfile.getGoalType()
+        );
     }
 
     public Gender getGender() {
