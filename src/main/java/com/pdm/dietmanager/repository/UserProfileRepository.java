@@ -7,5 +7,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * UserProfile 엔티티의 데이터베이스 접근 인터페이스.
  */
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
-
 }
