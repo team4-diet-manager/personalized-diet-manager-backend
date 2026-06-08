@@ -21,6 +21,22 @@ public class MealLogRequest {
     @Min(value = 1, message = "섭취 수량은 1 이상이어야 합니다.")
     private int quantity;
 
+    public static MealLogRequest of(
+            Long profileId,
+            LocalDate mealDate,
+            MealType mealType,
+            Long foodId,
+            int quantity
+    ) {
+        MealLogRequest request = new MealLogRequest();
+        request.profileId = profileId;
+        request.mealDate = mealDate;
+        request.mealType = mealType;
+        request.foodId = foodId;
+        request.quantity = quantity;
+        return request;
+    }
+
     public Long getProfileId() {
         return profileId;
     }

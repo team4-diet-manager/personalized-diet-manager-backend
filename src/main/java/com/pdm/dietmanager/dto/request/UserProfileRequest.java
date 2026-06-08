@@ -26,6 +26,18 @@ public class UserProfileRequest {
     @NotNull(message = "목표는 필수 입력값입니다.")
     private GoalType goalType;
 
+    public static UserProfileRequest of(Gender gender, int age, double height, double weight,
+                                        ActivityLevel activityLevel, GoalType goalType) {
+        UserProfileRequest request = new UserProfileRequest();
+        request.gender = gender;
+        request.age = age;
+        request.height = height;
+        request.weight = weight;
+        request.activityLevel = activityLevel;
+        request.goalType = goalType;
+        return request;
+    }
+
     public Gender getGender() {
         return gender;
     }
