@@ -24,4 +24,10 @@ public class MuscleGainStrategy implements CalorieStrategy {
 
         return (int) Math.round(calculateTdee(request) * surplusRatio);
     }
+
+    @Override
+    public MacroRatio macroRatio() {
+        // 벌크업: 운동 수행과 회복에 필요한 탄수화물 비중을 높인 고탄수 구성.
+        return new MacroRatio(0.30, 0.50, 0.20);
+    }
 }

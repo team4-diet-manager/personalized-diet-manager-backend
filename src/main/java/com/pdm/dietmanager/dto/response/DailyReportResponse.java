@@ -26,11 +26,15 @@ public class DailyReportResponse {
     @Schema(description = "권장량 대비 섭취량 비교 메시지", example = "권장 칼로리보다 995kcal 적게 섭취했습니다.")
     private final String message;
 
+    @Schema(description = "목표별 권장 탄단지 그램")
+    private final MacroNutrients recommendedMacros;
+
     public DailyReportResponse(
             Long profileId,
             LocalDate date,
             int recommendedCalories,
-            int intakeCalories
+            int intakeCalories,
+            MacroNutrients recommendedMacros
     ) {
         this.profileId = profileId;
         this.date = date;
@@ -39,6 +43,7 @@ public class DailyReportResponse {
         this.difference = intakeCalories - recommendedCalories;
         this.status = resolveStatus(this.difference);
         this.message = createMessage(this.difference);
+        this.recommendedMacros = recommendedMacros;
     }
 
     public Long getProfileId() {
@@ -67,6 +72,10 @@ public class DailyReportResponse {
 
     public String getMessage() {
         return message;
+    }
+
+    public MacroNutrients getRecommendedMacros() {
+        return recommendedMacros;
     }
 
     private String resolveStatus(int difference) {

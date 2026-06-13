@@ -3,6 +3,7 @@ package com.pdm.dietmanager.controller;
 import com.pdm.dietmanager.dto.request.CalorieRequest;
 import com.pdm.dietmanager.dto.response.DailyReportResponse;
 import com.pdm.dietmanager.dto.response.ErrorResponse;
+import com.pdm.dietmanager.dto.response.MacroNutrients;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.service.CalorieService;
 import com.pdm.dietmanager.service.MealLogService;
@@ -60,8 +61,15 @@ public class ReportController {
         UserProfile userProfile = userProfileService.findProfile(profileId);
         CalorieRequest calorieRequest = CalorieRequest.from(userProfile);
         int recommendedCalories = calorieService.calculateRecommendedCalories(calorieRequest);
+        MacroNutrients recommendedMacros = calorieService.calculateRecommendedMacros(calorieRequest);
         int intakeCalories = mealLogService.calculateDailyTotalCalories(profileId, date);
 
-        return new DailyReportResponse(profileId, date, recommendedCalories, intakeCalories);
+        return new DailyReportResponse(
+                profileId,
+                date,
+                recommendedCalories,
+                intakeCalories,
+                recommendedMacros
+        );
     }
 }

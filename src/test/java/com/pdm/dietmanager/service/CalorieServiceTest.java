@@ -3,6 +3,7 @@ package com.pdm.dietmanager.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.pdm.dietmanager.dto.request.CalorieRequest;
+import com.pdm.dietmanager.dto.response.MacroNutrients;
 import com.pdm.dietmanager.enums.ActivityLevel;
 import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
@@ -65,6 +66,31 @@ class CalorieServiceTest {
         int calories = calorieService.calculateRecommendedCalories(request);
 
         assertThat(calories).isEqualTo(2663);
+    }
+
+    @Test
+    void weightLossStrategyProducesHighProteinMacros() {
+        // 다이어트 권장 1595kcal을 40/35/25 비율로 나누면
+        // 단백질 160g(4kcal/g), 탄수 140g(4kcal/g), 지방 44g(9kcal/g)이 된다.
+        CalorieRequest request = createRequest(GoalType.WEIGHT_LOSS);
+
+        MacroNutrients macros = calorieService.calculateRecommendedMacros(request);
+
+        assertThat(macros.getProteinGrams()).isEqualTo(160);
+        assertThat(macros.getCarbGrams()).isEqualTo(140);
+        assertThat(macros.getFatGrams()).isEqualTo(44);
+    }
+
+    @Test
+    void macroRatiosDifferByGoal() {
+        // 같은 신체 정보라도 목표 전략에 따라 매크로 구성이 달라진다.
+        MacroNutrients weightLoss =
+                calorieService.calculateRecommendedMacros(createRequest(GoalType.WEIGHT_LOSS));
+        MacroNutrients muscleGain =
+                calorieService.calculateRecommendedMacros(createRequest(GoalType.MUSCLE_GAIN));
+
+        // 벌크업은 다이어트보다 탄수화물 그램이 더 많다.
+        assertThat(muscleGain.getCarbGrams()).isGreaterThan(weightLoss.getCarbGrams());
     }
 
     private CalorieRequest createRequest(GoalType goalType) {

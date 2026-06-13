@@ -22,4 +22,10 @@ public class WeightLossStrategy implements CalorieStrategy {
         // 활동량이 낮은 사용자는 단순 배율만 적용하면 BMR 아래로 떨어질 수 있어 하한선을 둔다.
         return (int) Math.round(Math.max(targetCalories, basalFloor));
     }
+
+    @Override
+    public MacroRatio macroRatio() {
+        // 다이어트: 근손실을 막기 위해 단백질 비중을 높인 고단백 구성.
+        return new MacroRatio(0.40, 0.35, 0.25);
+    }
 }

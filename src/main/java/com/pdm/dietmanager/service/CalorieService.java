@@ -2,6 +2,7 @@ package com.pdm.dietmanager.service;
 
 import com.pdm.dietmanager.dto.request.CalorieRequest;
 import com.pdm.dietmanager.dto.response.CalorieResponse;
+import com.pdm.dietmanager.dto.response.MacroNutrients;
 import com.pdm.dietmanager.enums.GoalType;
 import com.pdm.dietmanager.strategy.CalorieStrategy;
 import java.util.EnumMap;
@@ -25,31 +26,29 @@ public class CalorieService {
     }
 
     public int calculateRecommendedCalories(CalorieRequest request) {
-        CalorieStrategy strategy = strategyMap.get(request.getGoalType());
+        return getStrategy(request.getGoalType()).calculate(request);
+    }
+
+    public MacroNutrients calculateRecommendedMacros(CalorieRequest request) {
+        return getStrategy(request.getGoalType()).calculateMacros(request);
+    }
+
+    public CalorieResponse calculateRecommendation(CalorieRequest request) {
+        CalorieStrategy strategy = getStrategy(request.getGoalType());
+        return new CalorieResponse(
+                request.getGoalType(),
+                strategy.calculate(request),
+                strategy.calculateMacros(request)
+        );
+    }
+
+    private CalorieStrategy getStrategy(GoalType goalType) {
+        CalorieStrategy strategy = strategyMap.get(goalType);
 
         if (strategy == null) {
             throw new IllegalArgumentException("지원하지 않는 목표입니다.");
         }
 
-        return strategy.calculate(request);
-    }
-
-    public CalorieResponse calculateRecommendation(CalorieRequest request) {
-        return CalorieResponse.builder()
-                .goalType(request.getGoalType())
-                .recommendedCalories(calculateRecommendedCalories(request))
-                .dailyIntakeCalories(0)
-                .build();
-    }
-
-    public CalorieResponse compareWithDailyIntake(
-            CalorieRequest request,
-            int dailyIntakeCalories
-    ) {
-        return CalorieResponse.builder()
-                .goalType(request.getGoalType())
-                .recommendedCalories(calculateRecommendedCalories(request))
-                .dailyIntakeCalories(dailyIntakeCalories)
-                .build();
+        return strategy;
     }
 }
