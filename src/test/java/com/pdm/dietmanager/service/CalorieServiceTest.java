@@ -46,13 +46,38 @@ class CalorieServiceTest {
         assertThat(calories).isEqualTo(1994);
     }
 
+    @Test
+    void weightLossStrategyNeverRecommendsBelowBasalMetabolicRate() {
+        // 저활동(1.2) 사용자는 TDEE에 0.8을 곱하면 BMR(1287) 아래로 떨어지므로,
+        // 하한선 로직이 작동해 BMR 수준으로 보정되어야 한다.
+        CalorieRequest request = createRequest(GoalType.WEIGHT_LOSS, ActivityLevel.LOW);
+
+        int calories = calorieService.calculateRecommendedCalories(request);
+
+        assertThat(calories).isEqualTo(1287);
+    }
+
+    @Test
+    void muscleGainStrategyAppliesHigherSurplusForHighActivity() {
+        // 고활동 사용자는 잉여 칼로리 배율이 1.20으로 높아진다.
+        CalorieRequest request = createRequest(GoalType.MUSCLE_GAIN, ActivityLevel.HIGH);
+
+        int calories = calorieService.calculateRecommendedCalories(request);
+
+        assertThat(calories).isEqualTo(2663);
+    }
+
     private CalorieRequest createRequest(GoalType goalType) {
+        return createRequest(goalType, ActivityLevel.NORMAL);
+    }
+
+    private CalorieRequest createRequest(GoalType goalType, ActivityLevel activityLevel) {
         return CalorieRequest.of(
                 Gender.FEMALE,
                 23,
                 162.0,
                 55.0,
-                ActivityLevel.NORMAL,
+                activityLevel,
                 goalType
         );
     }
