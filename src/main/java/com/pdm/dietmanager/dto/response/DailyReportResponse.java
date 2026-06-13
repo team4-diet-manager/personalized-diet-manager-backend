@@ -1,14 +1,29 @@
 package com.pdm.dietmanager.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 
+@Schema(description = "일일 칼로리 리포트 응답")
 public class DailyReportResponse {
+    @Schema(description = "사용자 프로필 ID", example = "1")
     private final Long profileId;
+
+    @Schema(description = "리포트 날짜", example = "2026-06-09")
     private final LocalDate date;
+
+    @Schema(description = "프로필 목표 기준 하루 권장 칼로리", example = "1595")
     private final int recommendedCalories;
+
+    @Schema(description = "해당 날짜의 실제 섭취 칼로리", example = "600")
     private final int intakeCalories;
+
+    @Schema(description = "섭취 칼로리 - 권장 칼로리", example = "-995")
     private final int difference;
+
+    @Schema(description = "섭취 상태", example = "UNDER")
     private final String status;
+
+    @Schema(description = "권장량 대비 섭취량 비교 메시지", example = "권장 칼로리보다 995kcal 적게 섭취했습니다.")
     private final String message;
 
     public DailyReportResponse(

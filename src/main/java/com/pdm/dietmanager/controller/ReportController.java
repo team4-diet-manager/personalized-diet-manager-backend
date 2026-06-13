@@ -2,10 +2,16 @@ package com.pdm.dietmanager.controller;
 
 import com.pdm.dietmanager.dto.request.CalorieRequest;
 import com.pdm.dietmanager.dto.response.DailyReportResponse;
+import com.pdm.dietmanager.dto.response.ErrorResponse;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.service.CalorieService;
 import com.pdm.dietmanager.service.MealLogService;
 import com.pdm.dietmanager.service.UserProfileService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/reports")
+@Tag(name = "Report", description = "권장 칼로리와 실제 섭취 칼로리 비교 API")
 public class ReportController {
     private final UserProfileService userProfileService;
     private final MealLogService mealLogService;
@@ -31,6 +38,21 @@ public class ReportController {
     }
 
     @GetMapping("/daily")
+    @Operation(
+            summary = "일일 칼로리 리포트 조회",
+            description = "저장된 프로필 목표 기준 권장 칼로리와 특정 날짜의 실제 섭취 칼로리를 비교한다."
+    )
+    @ApiResponse(responseCode = "200", description = "일일 리포트 조회 성공")
+    @ApiResponse(
+            responseCode = "400",
+            description = "필수 쿼리 파라미터 누락 또는 날짜 형식 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "프로필을 찾을 수 없음",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
     public DailyReportResponse getDailyReport(
             @RequestParam Long profileId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
