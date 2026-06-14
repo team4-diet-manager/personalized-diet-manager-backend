@@ -4,6 +4,8 @@ import com.pdm.dietmanager.dto.request.CalorieRequest;
 import com.pdm.dietmanager.dto.response.DailyReportResponse;
 import com.pdm.dietmanager.dto.response.ErrorResponse;
 import com.pdm.dietmanager.dto.response.MacroNutrients;
+import com.pdm.dietmanager.dto.response.WeeklyReportDay;
+import com.pdm.dietmanager.dto.response.WeeklyReportResponse;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.service.CalorieService;
 import com.pdm.dietmanager.service.MealLogService;
@@ -14,6 +16,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,5 +77,41 @@ public class ReportController {
                 recommendedMacros,
                 intakeMacros
         );
+    }
+
+    @GetMapping("/weekly")
+    @Operation(
+            summary = "주간 칼로리 추이 조회",
+            description = "endDate(기본값: 오늘)를 마지막 날로 하는 최근 7일의 권장/섭취 칼로리를 날짜순으로 반환한다."
+    )
+    @ApiResponse(responseCode = "200", description = "주간 추이 조회 성공")
+    @ApiResponse(
+            responseCode = "400",
+            description = "필수 쿼리 파라미터 누락 또는 날짜 형식 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "프로필을 찾을 수 없음",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
+    public WeeklyReportResponse getWeeklyReport(
+            @RequestParam Long profileId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        UserProfile userProfile = userProfileService.findProfile(profileId);
+        int recommendedCalories = calorieService.calculateRecommendedCalories(
+                CalorieRequest.from(userProfile)
+        );
+        LocalDate end = endDate != null ? endDate : LocalDate.now();
+
+        List<WeeklyReportDay> days = new ArrayList<>();
+        for (int offset = 6; offset >= 0; offset--) {
+            LocalDate day = end.minusDays(offset);
+            int intakeCalories = mealLogService.calculateDailyTotalCalories(profileId, day);
+            days.add(new WeeklyReportDay(day, recommendedCalories, intakeCalories));
+        }
+
+        return new WeeklyReportResponse(profileId, days);
     }
 }
