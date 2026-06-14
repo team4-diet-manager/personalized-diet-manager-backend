@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "식단 기록 등록 및 수정 요청")
 public class MealLogRequest {
     @Schema(description = "사용자 프로필 ID", example = "1")
@@ -42,25 +44,5 @@ public class MealLogRequest {
         request.foodId = foodId;
         request.quantity = quantity;
         return request;
-    }
-
-    public Long getProfileId() {
-        return profileId;
-    }
-
-    public LocalDate getMealDate() {
-        return mealDate;
-    }
-
-    public MealType getMealType() {
-        return mealType;
-    }
-
-    public Long getFoodId() {
-        return foodId;
-    }
-
-    public int getQuantity() {
-        return quantity;
     }
 }

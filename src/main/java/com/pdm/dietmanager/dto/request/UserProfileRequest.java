@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "사용자 신체 정보 및 목표 등록 요청")
 public class UserProfileRequest {
     @Schema(description = "성별", example = "FEMALE")
@@ -44,29 +46,5 @@ public class UserProfileRequest {
         request.activityLevel = activityLevel;
         request.goalType = goalType;
         return request;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public ActivityLevel getActivityLevel() {
-        return activityLevel;
-    }
-
-    public GoalType getGoalType() {
-        return goalType;
     }
 }

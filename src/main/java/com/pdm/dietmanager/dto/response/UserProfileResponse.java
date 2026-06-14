@@ -5,7 +5,9 @@ import com.pdm.dietmanager.enums.ActivityLevel;
 import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "사용자 프로필 응답")
 public class UserProfileResponse {
     @Schema(description = "사용자 프로필 ID", example = "1")
@@ -41,33 +43,5 @@ public class UserProfileResponse {
 
     public static UserProfileResponse from(UserProfile userProfile) {
         return new UserProfileResponse(userProfile);
-    }
-
-    public Long getProfileId() {
-        return profileId;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public ActivityLevel getActivityLevel() {
-        return activityLevel;
-    }
-
-    public GoalType getGoalType() {
-        return goalType;
     }
 }

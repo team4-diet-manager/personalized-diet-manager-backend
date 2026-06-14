@@ -3,7 +3,9 @@ package com.pdm.dietmanager.dto.response;
 import com.pdm.dietmanager.entity.Food;
 import com.pdm.dietmanager.enums.FoodGrade;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "음식 정보 응답")
 public class FoodResponse {
     @Schema(description = "음식 ID", example = "1")
@@ -47,37 +49,5 @@ public class FoodResponse {
 
     public static FoodResponse of(Food food, FoodGrade grade) {
         return new FoodResponse(food, grade);
-    }
-
-    public Long getFoodId() {
-        return foodId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getCalories() {
-        return calories;
-    }
-
-    public String getServingSize() {
-        return servingSize;
-    }
-
-    public int getProteinGrams() {
-        return proteinGrams;
-    }
-
-    public int getCarbGrams() {
-        return carbGrams;
-    }
-
-    public int getFatGrams() {
-        return fatGrams;
-    }
-
-    public FoodGrade getGrade() {
-        return grade;
     }
 }

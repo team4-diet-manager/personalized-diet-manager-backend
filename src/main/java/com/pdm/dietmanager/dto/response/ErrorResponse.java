@@ -2,8 +2,10 @@ package com.pdm.dietmanager.dto.response;
 
 import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 @Schema(description = "공통 오류 응답")
 public class ErrorResponse {
     @Schema(description = "HTTP 상태 코드", example = "400")
@@ -42,22 +44,7 @@ public class ErrorResponse {
         return new ErrorResponse(status.value(), status.name(), message, fieldErrors);
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public List<FieldErrorResponse> getFieldErrors() {
-        return fieldErrors;
-    }
-
+    @Getter
     public static class FieldErrorResponse {
         @Schema(description = "오류가 발생한 필드명", example = "age")
         private final String field;
@@ -68,14 +55,6 @@ public class ErrorResponse {
         public FieldErrorResponse(String field, String message) {
             this.field = field;
             this.message = message;
-        }
-
-        public String getField() {
-            return field;
-        }
-
-        public String getMessage() {
-            return message;
         }
     }
 }

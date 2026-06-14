@@ -1,7 +1,9 @@
 package com.pdm.dietmanager.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "목표별 권장 탄수화물·단백질·지방(매크로) 그램")
 public class MacroNutrients {
     private static final double KCAL_PER_GRAM_PROTEIN = 4.0;
@@ -32,17 +34,5 @@ public class MacroNutrients {
         int carb = (int) Math.round(calories * carbRatio / KCAL_PER_GRAM_CARB);
         int fat = (int) Math.round(calories * fatRatio / KCAL_PER_GRAM_FAT);
         return new MacroNutrients(protein, carb, fat);
-    }
-
-    public int getProteinGrams() {
-        return proteinGrams;
-    }
-
-    public int getCarbGrams() {
-        return carbGrams;
-    }
-
-    public int getFatGrams() {
-        return fatGrams;
     }
 }

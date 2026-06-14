@@ -51,9 +51,9 @@ class DailyReportFlowTest {
         ));
 
         UserProfile userProfile = userProfileService.findProfile(profile.getProfileId());
-        int recommendedCalories = calorieService.calculateRecommendedCalories(
+        int recommendedCalories = calorieService.calculateRecommendation(
                 CalorieRequest.from(userProfile)
-        );
+        ).getRecommendedCalories();
         int dailyTotalCalories = mealLogService.calculateDailyTotalCalories(
                 profile.getProfileId(),
                 mealDate

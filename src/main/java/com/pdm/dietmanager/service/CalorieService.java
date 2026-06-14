@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CalorieService {
+
     private final Map<GoalType, CalorieStrategy> strategyMap;
 
     public CalorieService(List<CalorieStrategy> strategies) {
@@ -25,20 +26,18 @@ public class CalorieService {
                 ));
     }
 
-    public int calculateRecommendedCalories(CalorieRequest request) {
-        return getStrategy(request.getGoalType()).calculate(request);
-    }
 
-    public MacroNutrients calculateRecommendedMacros(CalorieRequest request) {
-        return getStrategy(request.getGoalType()).calculateMacros(request);
-    }
 
     public CalorieResponse calculateRecommendation(CalorieRequest request) {
         CalorieStrategy strategy = getStrategy(request.getGoalType());
+
+        int recommendedCalories = strategy.calculate(request);
+        MacroNutrients macros = strategy.calculateMacros(recommendedCalories);
+
         return new CalorieResponse(
                 request.getGoalType(),
-                strategy.calculate(request),
-                strategy.calculateMacros(request)
+                recommendedCalories,
+                macros
         );
     }
 

@@ -5,17 +5,15 @@ import com.pdm.dietmanager.dto.response.UserProfileResponse;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.UserProfileRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UserProfileService {
     private final UserProfileRepository userProfileRepository;
-
-    public UserProfileService(UserProfileRepository userProfileRepository) {
-        this.userProfileRepository = userProfileRepository;
-    }
 
     @Transactional
     public UserProfileResponse createProfile(UserProfileRequest request) {

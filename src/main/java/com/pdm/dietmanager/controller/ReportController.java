@@ -1,6 +1,7 @@
 package com.pdm.dietmanager.controller;
 
 import com.pdm.dietmanager.dto.request.CalorieRequest;
+import com.pdm.dietmanager.dto.response.CalorieResponse;
 import com.pdm.dietmanager.dto.response.DailyReportResponse;
 import com.pdm.dietmanager.dto.response.ErrorResponse;
 import com.pdm.dietmanager.dto.response.MacroNutrients;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,21 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/reports")
+@RequiredArgsConstructor
 @Tag(name = "Report", description = "권장 칼로리와 실제 섭취 칼로리 비교 API")
 public class ReportController {
     private final UserProfileService userProfileService;
     private final MealLogService mealLogService;
     private final CalorieService calorieService;
-
-    public ReportController(
-            UserProfileService userProfileService,
-            MealLogService mealLogService,
-            CalorieService calorieService
-    ) {
-        this.userProfileService = userProfileService;
-        this.mealLogService = mealLogService;
-        this.calorieService = calorieService;
-    }
 
     @GetMapping("/daily")
     @Operation(
@@ -64,17 +57,16 @@ public class ReportController {
     ) {
         UserProfile userProfile = userProfileService.findProfile(profileId);
         CalorieRequest calorieRequest = CalorieRequest.from(userProfile);
-        int recommendedCalories = calorieService.calculateRecommendedCalories(calorieRequest);
-        MacroNutrients recommendedMacros = calorieService.calculateRecommendedMacros(calorieRequest);
+        CalorieResponse recommendation = calorieService.calculateRecommendation(calorieRequest);
         int intakeCalories = mealLogService.calculateDailyTotalCalories(profileId, date);
         MacroNutrients intakeMacros = mealLogService.calculateDailyIntakeMacros(profileId, date);
 
         return new DailyReportResponse(
                 profileId,
                 date,
-                recommendedCalories,
+                recommendation.getRecommendedCalories(),
                 intakeCalories,
-                recommendedMacros,
+                recommendation.getMacros(),
                 intakeMacros
         );
     }
@@ -100,9 +92,9 @@ public class ReportController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         UserProfile userProfile = userProfileService.findProfile(profileId);
-        int recommendedCalories = calorieService.calculateRecommendedCalories(
+        int recommendedCalories = calorieService.calculateRecommendation(
                 CalorieRequest.from(userProfile)
-        );
+        ).getRecommendedCalories();
         LocalDate end = endDate != null ? endDate : LocalDate.now();
 
         List<WeeklyReportDay> days = new ArrayList<>();

@@ -2,9 +2,12 @@ package com.pdm.dietmanager.dto.response;
 
 import com.pdm.dietmanager.enums.GoalType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "권장 칼로리 계산 응답")
 public class CalorieResponse {
+
     @Schema(description = "식단 관리 목표", example = "WEIGHT_LOSS")
     private final GoalType goalType;
 
@@ -20,15 +23,7 @@ public class CalorieResponse {
         this.macros = macros;
     }
 
-    public GoalType getGoalType() {
-        return goalType;
-    }
-
-    public int getRecommendedCalories() {
-        return recommendedCalories;
-    }
-
-    public MacroNutrients getMacros() {
-        return macros;
+    public static CalorieResponse of(GoalType goalType, int recommendedCalories, MacroNutrients macros) {
+        return new CalorieResponse(goalType, recommendedCalories, macros);
     }
 }

@@ -17,9 +17,9 @@ public interface CalorieStrategy {
     /**
      * 권장 칼로리와 목표별 매크로 비율을 조합해 탄단지 권장 그램을 계산한다.
      */
-    default MacroNutrients calculateMacros(CalorieRequest request) {
+    default MacroNutrients calculateMacros(int recommendedCalories) {
         MacroRatio ratio = macroRatio();
-        return MacroNutrients.of(calculate(request), ratio.protein(), ratio.carb(), ratio.fat());
+        return MacroNutrients.of(recommendedCalories, ratio.protein(), ratio.carb(), ratio.fat());
     }
 
     record MacroRatio(double protein, double carb, double fat) {

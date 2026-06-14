@@ -12,25 +12,17 @@ import com.pdm.dietmanager.repository.MealLogRepository;
 import com.pdm.dietmanager.repository.UserProfileRepository;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class MealLogService {
     private final MealLogRepository mealLogRepository;
     private final UserProfileRepository userProfileRepository;
     private final FoodRepository foodRepository;
-
-    public MealLogService(
-            MealLogRepository mealLogRepository,
-            UserProfileRepository userProfileRepository,
-            FoodRepository foodRepository
-    ) {
-        this.mealLogRepository = mealLogRepository;
-        this.userProfileRepository = userProfileRepository;
-        this.foodRepository = foodRepository;
-    }
 
     @Transactional
     public MealLogResponse createMealLog(MealLogRequest request) {

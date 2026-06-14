@@ -3,7 +3,9 @@ package com.pdm.dietmanager.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "날짜별 식단 기록 조회 응답")
 public class DailyMealLogResponse {
     @Schema(description = "사용자 프로필 ID", example = "1")
@@ -28,21 +30,5 @@ public class DailyMealLogResponse {
         this.mealDate = mealDate;
         this.mealLogs = mealLogs;
         this.dailyTotalCalories = dailyTotalCalories;
-    }
-
-    public Long getProfileId() {
-        return profileId;
-    }
-
-    public LocalDate getMealDate() {
-        return mealDate;
-    }
-
-    public List<MealLogResponse> getMealLogs() {
-        return mealLogs;
-    }
-
-    public int getDailyTotalCalories() {
-        return dailyTotalCalories;
     }
 }

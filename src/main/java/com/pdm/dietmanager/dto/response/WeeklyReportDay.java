@@ -2,7 +2,9 @@ package com.pdm.dietmanager.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "주간 리포트의 하루 단위 항목")
 public class WeeklyReportDay {
     @Schema(description = "날짜", example = "2026-06-15")
@@ -18,17 +20,5 @@ public class WeeklyReportDay {
         this.date = date;
         this.recommendedCalories = recommendedCalories;
         this.intakeCalories = intakeCalories;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public int getRecommendedCalories() {
-        return recommendedCalories;
-    }
-
-    public int getIntakeCalories() {
-        return intakeCalories;
     }
 }

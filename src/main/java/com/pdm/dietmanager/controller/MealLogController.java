@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,14 +28,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/meal-logs")
 @Tag(name = "Meal Log", description = "날짜별 식단 기록 등록, 조회, 수정, 삭제 API")
 public class MealLogController {
     private final MealLogService mealLogService;
-
-    public MealLogController(MealLogService mealLogService) {
-        this.mealLogService = mealLogService;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

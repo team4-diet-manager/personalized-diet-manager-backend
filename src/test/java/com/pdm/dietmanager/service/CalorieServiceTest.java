@@ -24,7 +24,7 @@ class CalorieServiceTest {
     void calculateRecommendedCaloriesAppliesWeightLossStrategy() {
         CalorieRequest request = createRequest(GoalType.WEIGHT_LOSS);
 
-        int calories = calorieService.calculateRecommendedCalories(request);
+        int calories = calorieService.calculateRecommendation(request).getRecommendedCalories();
 
         assertThat(calories).isEqualTo(1595);
     }
@@ -33,7 +33,7 @@ class CalorieServiceTest {
     void calculateRecommendedCaloriesAppliesMuscleGainStrategy() {
         CalorieRequest request = createRequest(GoalType.MUSCLE_GAIN);
 
-        int calories = calorieService.calculateRecommendedCalories(request);
+        int calories = calorieService.calculateRecommendation(request).getRecommendedCalories();
 
         assertThat(calories).isEqualTo(2293);
     }
@@ -42,7 +42,7 @@ class CalorieServiceTest {
     void calculateRecommendedCaloriesAppliesMaintainStrategy() {
         CalorieRequest request = createRequest(GoalType.MAINTAIN);
 
-        int calories = calorieService.calculateRecommendedCalories(request);
+        int calories = calorieService.calculateRecommendation(request).getRecommendedCalories();
 
         assertThat(calories).isEqualTo(1994);
     }
@@ -53,7 +53,7 @@ class CalorieServiceTest {
         // 하한선 로직이 작동해 BMR 수준으로 보정되어야 한다.
         CalorieRequest request = createRequest(GoalType.WEIGHT_LOSS, ActivityLevel.LOW);
 
-        int calories = calorieService.calculateRecommendedCalories(request);
+        int calories = calorieService.calculateRecommendation(request).getRecommendedCalories();
 
         assertThat(calories).isEqualTo(1287);
     }
@@ -63,7 +63,7 @@ class CalorieServiceTest {
         // 고활동 사용자는 잉여 칼로리 배율이 1.20으로 높아진다.
         CalorieRequest request = createRequest(GoalType.MUSCLE_GAIN, ActivityLevel.HIGH);
 
-        int calories = calorieService.calculateRecommendedCalories(request);
+        int calories = calorieService.calculateRecommendation(request).getRecommendedCalories();
 
         assertThat(calories).isEqualTo(2663);
     }
@@ -74,7 +74,7 @@ class CalorieServiceTest {
         // 단백질 160g(4kcal/g), 탄수 140g(4kcal/g), 지방 44g(9kcal/g)이 된다.
         CalorieRequest request = createRequest(GoalType.WEIGHT_LOSS);
 
-        MacroNutrients macros = calorieService.calculateRecommendedMacros(request);
+        MacroNutrients macros = calorieService.calculateRecommendation(request).getMacros();
 
         assertThat(macros.getProteinGrams()).isEqualTo(160);
         assertThat(macros.getCarbGrams()).isEqualTo(140);
@@ -85,9 +85,9 @@ class CalorieServiceTest {
     void macroRatiosDifferByGoal() {
         // 같은 신체 정보라도 목표 전략에 따라 매크로 구성이 달라진다.
         MacroNutrients weightLoss =
-                calorieService.calculateRecommendedMacros(createRequest(GoalType.WEIGHT_LOSS));
+                calorieService.calculateRecommendation(createRequest(GoalType.WEIGHT_LOSS)).getMacros();
         MacroNutrients muscleGain =
-                calorieService.calculateRecommendedMacros(createRequest(GoalType.MUSCLE_GAIN));
+                calorieService.calculateRecommendation(createRequest(GoalType.MUSCLE_GAIN)).getMacros();
 
         // 벌크업은 다이어트보다 탄수화물 그램이 더 많다.
         assertThat(muscleGain.getCarbGrams()).isGreaterThan(weightLoss.getCarbGrams());

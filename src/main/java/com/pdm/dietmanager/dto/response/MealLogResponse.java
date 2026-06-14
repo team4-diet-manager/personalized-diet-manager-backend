@@ -4,7 +4,9 @@ import com.pdm.dietmanager.entity.MealLog;
 import com.pdm.dietmanager.enums.MealType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "식단 기록 응답")
 public class MealLogResponse {
     @Schema(description = "식단 기록 ID", example = "1")
@@ -48,41 +50,5 @@ public class MealLogResponse {
 
     public static MealLogResponse from(MealLog mealLog) {
         return new MealLogResponse(mealLog);
-    }
-
-    public Long getMealLogId() {
-        return mealLogId;
-    }
-
-    public Long getProfileId() {
-        return profileId;
-    }
-
-    public LocalDate getMealDate() {
-        return mealDate;
-    }
-
-    public MealType getMealType() {
-        return mealType;
-    }
-
-    public Long getFoodId() {
-        return foodId;
-    }
-
-    public String getFoodName() {
-        return foodName;
-    }
-
-    public int getCalories() {
-        return calories;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public int getTotalCalories() {
-        return totalCalories;
     }
 }

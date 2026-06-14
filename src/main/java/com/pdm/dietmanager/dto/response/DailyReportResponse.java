@@ -2,7 +2,9 @@ package com.pdm.dietmanager.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "일일 칼로리 리포트 응답")
 public class DailyReportResponse {
     @Schema(description = "사용자 프로필 ID", example = "1")
@@ -49,42 +51,6 @@ public class DailyReportResponse {
         this.message = createMessage(this.difference);
         this.recommendedMacros = recommendedMacros;
         this.intakeMacros = intakeMacros;
-    }
-
-    public Long getProfileId() {
-        return profileId;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public int getRecommendedCalories() {
-        return recommendedCalories;
-    }
-
-    public int getIntakeCalories() {
-        return intakeCalories;
-    }
-
-    public int getDifference() {
-        return difference;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public MacroNutrients getRecommendedMacros() {
-        return recommendedMacros;
-    }
-
-    public MacroNutrients getIntakeMacros() {
-        return intakeMacros;
     }
 
     private String resolveStatus(int difference) {

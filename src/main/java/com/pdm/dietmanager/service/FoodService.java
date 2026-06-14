@@ -6,19 +6,17 @@ import com.pdm.dietmanager.enums.GoalType;
 import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.FoodRepository;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class FoodService {
     private final FoodRepository foodRepository;
     private final FoodGradeService foodGradeService;
 
-    public FoodService(FoodRepository foodRepository, FoodGradeService foodGradeService) {
-        this.foodRepository = foodRepository;
-        this.foodGradeService = foodGradeService;
-    }
 
     public List<FoodResponse> getFoods(String keyword, GoalType goalType) {
         List<Food> foods = hasText(keyword)
