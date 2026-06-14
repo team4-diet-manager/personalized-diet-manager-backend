@@ -40,6 +40,7 @@ public class UserProfileService {
     public UserProfileResponse updateProfile(Long profileId, UserProfileRequest request) {
         UserProfile userProfile = findProfile(profileId);
         userProfile.update(
+                request.getGender(),
                 request.getAge(),
                 request.getHeight(),
                 request.getWeight(),

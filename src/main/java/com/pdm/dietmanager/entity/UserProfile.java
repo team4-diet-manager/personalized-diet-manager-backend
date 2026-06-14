@@ -62,8 +62,9 @@ public class UserProfile {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void update(int age, double height, double weight,
+    public void update(Gender gender, int age, double height, double weight,
                        ActivityLevel activityLevel, GoalType goalType) {
+        this.gender = gender;
         this.age = age;
         this.height = height;
         this.weight = weight;
