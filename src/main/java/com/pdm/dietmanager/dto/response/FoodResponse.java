@@ -1,6 +1,7 @@
 package com.pdm.dietmanager.dto.response;
 
 import com.pdm.dietmanager.entity.Food;
+import com.pdm.dietmanager.enums.FoodGrade;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "음식 정보 응답")
@@ -26,7 +27,10 @@ public class FoodResponse {
     @Schema(description = "1회 제공량 기준 지방(g)", example = "4")
     private final int fatGrams;
 
-    private FoodResponse(Food food) {
+    @Schema(description = "목표 기준 음식 적합도 신호등 등급(목표 미지정 시 null)", example = "GREEN")
+    private final FoodGrade grade;
+
+    private FoodResponse(Food food, FoodGrade grade) {
         this.foodId = food.getFoodId();
         this.name = food.getName();
         this.calories = food.getCalories();
@@ -34,10 +38,15 @@ public class FoodResponse {
         this.proteinGrams = food.getProteinGrams();
         this.carbGrams = food.getCarbGrams();
         this.fatGrams = food.getFatGrams();
+        this.grade = grade;
     }
 
     public static FoodResponse from(Food food) {
-        return new FoodResponse(food);
+        return new FoodResponse(food, null);
+    }
+
+    public static FoodResponse of(Food food, FoodGrade grade) {
+        return new FoodResponse(food, grade);
     }
 
     public Long getFoodId() {
@@ -66,5 +75,9 @@ public class FoodResponse {
 
     public int getFatGrams() {
         return fatGrams;
+    }
+
+    public FoodGrade getGrade() {
+        return grade;
     }
 }
