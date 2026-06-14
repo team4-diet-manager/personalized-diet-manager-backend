@@ -30,6 +30,15 @@ public class Food {
     @Column(name = "serving_size", nullable = false, length = 50)
     private String servingSize;
 
+    @Column(name = "protein_grams", nullable = false)
+    private int proteinGrams;
+
+    @Column(name = "carb_grams", nullable = false)
+    private int carbGrams;
+
+    @Column(name = "fat_grams", nullable = false)
+    private int fatGrams;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -37,10 +46,14 @@ public class Food {
     private List<MealLog> mealLogs = new ArrayList<>();
 
     @Builder
-    private Food(String name, int calories, String servingSize) {
+    private Food(String name, int calories, String servingSize,
+                 int proteinGrams, int carbGrams, int fatGrams) {
         this.name = name;
         this.calories = calories;
         this.servingSize = servingSize;
+        this.proteinGrams = proteinGrams;
+        this.carbGrams = carbGrams;
+        this.fatGrams = fatGrams;
         this.createdAt = LocalDateTime.now();
     }
 }

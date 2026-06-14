@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.pdm.dietmanager.dto.request.CalorieRequest;
 import com.pdm.dietmanager.dto.request.MealLogRequest;
 import com.pdm.dietmanager.dto.request.UserProfileRequest;
+import com.pdm.dietmanager.dto.response.MacroNutrients;
 import com.pdm.dietmanager.dto.response.UserProfileResponse;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.enums.ActivityLevel;
@@ -57,9 +58,17 @@ class DailyReportFlowTest {
                 profile.getProfileId(),
                 mealDate
         );
+        MacroNutrients intakeMacros = mealLogService.calculateDailyIntakeMacros(
+                profile.getProfileId(),
+                mealDate
+        );
 
         assertThat(recommendedCalories).isEqualTo(1595);
         assertThat(dailyTotalCalories).isEqualTo(165);
         assertThat(dailyTotalCalories - recommendedCalories).isEqualTo(-1430);
+        // 닭가슴살(foodId=1) 1개 섭취 시 매크로(P31/C0/F4)가 합산되어야 한다.
+        assertThat(intakeMacros.getProteinGrams()).isEqualTo(31);
+        assertThat(intakeMacros.getCarbGrams()).isZero();
+        assertThat(intakeMacros.getFatGrams()).isEqualTo(4);
     }
 }

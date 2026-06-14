@@ -1,6 +1,7 @@
 package com.pdm.dietmanager.service;
 
 import com.pdm.dietmanager.dto.request.MealLogRequest;
+import com.pdm.dietmanager.dto.response.MacroNutrients;
 import com.pdm.dietmanager.dto.response.MealLogResponse;
 import com.pdm.dietmanager.entity.Food;
 import com.pdm.dietmanager.entity.MealLog;
@@ -61,6 +62,29 @@ public class MealLogService {
                 mealDate
         );
         return totalCalories.intValue();
+    }
+
+    /**
+     * 특정 날짜에 실제로 섭취한 탄단지(매크로) 그램을 음식별 수량만큼 합산한다.
+     * 권장 매크로와 비교할 "실제 섭취 매크로"를 제공한다.
+     */
+    public MacroNutrients calculateDailyIntakeMacros(Long profileId, LocalDate mealDate) {
+        List<MealLog> mealLogs = mealLogRepository.findByUserProfile_ProfileIdAndMealDate(
+                profileId,
+                mealDate
+        );
+
+        int protein = 0;
+        int carb = 0;
+        int fat = 0;
+        for (MealLog mealLog : mealLogs) {
+            Food food = mealLog.getFood();
+            protein += food.getProteinGrams() * mealLog.getQuantity();
+            carb += food.getCarbGrams() * mealLog.getQuantity();
+            fat += food.getFatGrams() * mealLog.getQuantity();
+        }
+
+        return new MacroNutrients(protein, carb, fat);
     }
 
     @Transactional

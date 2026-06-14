@@ -63,13 +63,15 @@ public class ReportController {
         int recommendedCalories = calorieService.calculateRecommendedCalories(calorieRequest);
         MacroNutrients recommendedMacros = calorieService.calculateRecommendedMacros(calorieRequest);
         int intakeCalories = mealLogService.calculateDailyTotalCalories(profileId, date);
+        MacroNutrients intakeMacros = mealLogService.calculateDailyIntakeMacros(profileId, date);
 
         return new DailyReportResponse(
                 profileId,
                 date,
                 recommendedCalories,
                 intakeCalories,
-                recommendedMacros
+                recommendedMacros,
+                intakeMacros
         );
     }
 }

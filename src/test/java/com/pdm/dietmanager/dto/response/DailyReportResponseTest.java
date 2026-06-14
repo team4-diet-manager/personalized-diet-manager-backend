@@ -8,10 +8,11 @@ import org.junit.jupiter.api.Test;
 class DailyReportResponseTest {
     private static final LocalDate DATE = LocalDate.of(2026, 6, 14);
     private static final MacroNutrients MACROS = new MacroNutrients(100, 100, 40);
+    private static final MacroNutrients INTAKE = new MacroNutrients(40, 30, 10);
 
     @Test
     void intakeBelowRecommendationIsUnder() {
-        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 600, MACROS);
+        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 600, MACROS, INTAKE);
 
         assertThat(report.getDifference()).isEqualTo(-1000);
         assertThat(report.getStatus()).isEqualTo("UNDER");
@@ -20,7 +21,7 @@ class DailyReportResponseTest {
 
     @Test
     void intakeAboveRecommendationIsOver() {
-        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 2000, MACROS);
+        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 2000, MACROS, INTAKE);
 
         assertThat(report.getDifference()).isEqualTo(400);
         assertThat(report.getStatus()).isEqualTo("OVER");
@@ -29,7 +30,7 @@ class DailyReportResponseTest {
 
     @Test
     void intakeEqualToRecommendationIsMatch() {
-        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 1600, MACROS);
+        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 1600, MACROS, INTAKE);
 
         assertThat(report.getDifference()).isZero();
         assertThat(report.getStatus()).isEqualTo("MATCH");
