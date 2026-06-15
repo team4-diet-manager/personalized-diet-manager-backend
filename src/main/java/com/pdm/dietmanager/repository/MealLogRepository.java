@@ -23,4 +23,17 @@ public interface MealLogRepository extends JpaRepository<MealLog, Long> {
             @Param("profileId") Long profileId,
             @Param("mealDate") LocalDate mealDate
     );
+
+    @Query("""
+            SELECT DISTINCT m.mealDate
+            FROM MealLog m
+            WHERE m.userProfile.profileId = :profileId
+              AND m.mealDate BETWEEN :startDate AND :endDate
+            ORDER BY m.mealDate DESC
+            """)
+    List<LocalDate> findDistinctMealDatesBetween(
+            @Param("profileId") Long profileId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }

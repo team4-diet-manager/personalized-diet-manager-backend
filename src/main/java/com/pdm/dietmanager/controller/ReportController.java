@@ -5,12 +5,14 @@ import com.pdm.dietmanager.dto.response.CalorieResponse;
 import com.pdm.dietmanager.dto.response.DailyReportResponse;
 import com.pdm.dietmanager.dto.response.ErrorResponse;
 import com.pdm.dietmanager.dto.response.MacroNutrients;
+import com.pdm.dietmanager.dto.response.StatsResponse;
 import com.pdm.dietmanager.dto.response.WeeklyReportDay;
 import com.pdm.dietmanager.dto.response.WeeklyReportResponse;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.service.CalorieService;
 import com.pdm.dietmanager.service.ExerciseLogService;
 import com.pdm.dietmanager.service.MealLogService;
+import com.pdm.dietmanager.service.StatsService;
 import com.pdm.dietmanager.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,6 +38,7 @@ public class ReportController {
     private final MealLogService mealLogService;
     private final CalorieService calorieService;
     private final ExerciseLogService exerciseLogService;
+    private final StatsService statsService;
 
     @GetMapping("/daily")
     @Operation(
@@ -109,5 +112,29 @@ public class ReportController {
         }
 
         return new WeeklyReportResponse(profileId, days);
+    }
+
+    @GetMapping("/stats")
+    @Operation(
+            summary = "기록 통계 조회",
+            description = "연속 기록 일수(스트릭)와 최근 7일 목표 달성률을 반환한다."
+    )
+    @ApiResponse(responseCode = "200", description = "통계 조회 성공")
+    @ApiResponse(
+            responseCode = "400",
+            description = "필수 쿼리 파라미터 누락 또는 날짜 형식 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "프로필을 찾을 수 없음",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+    )
+    public StatsResponse getStats(
+            @RequestParam Long profileId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        LocalDate end = endDate != null ? endDate : LocalDate.now();
+        return statsService.getStats(profileId, end);
     }
 }

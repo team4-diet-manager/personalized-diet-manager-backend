@@ -48,6 +48,11 @@ public class MealLogService {
                 .toList();
     }
 
+    /** 기간 내 식단을 기록한 날짜를 최신순으로 반환한다(연속 기록 스트릭 계산용). */
+    public List<LocalDate> getLoggedDates(Long profileId, LocalDate startDate, LocalDate endDate) {
+        return mealLogRepository.findDistinctMealDatesBetween(profileId, startDate, endDate);
+    }
+
     public int calculateDailyTotalCalories(Long profileId, LocalDate mealDate) {
         Long totalCalories = mealLogRepository.sumTotalCaloriesByProfileIdAndMealDate(
                 profileId,
