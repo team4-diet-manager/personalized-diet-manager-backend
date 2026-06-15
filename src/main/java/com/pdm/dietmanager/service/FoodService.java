@@ -2,6 +2,7 @@ package com.pdm.dietmanager.service;
 
 import com.pdm.dietmanager.dto.response.FoodResponse;
 import com.pdm.dietmanager.entity.Food;
+import com.pdm.dietmanager.enums.FoodSortType;
 import com.pdm.dietmanager.enums.GoalType;
 import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.FoodRepository;
@@ -16,12 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class FoodService {
     private final FoodRepository foodRepository;
     private final FoodGradeService foodGradeService;
+    private final FoodSortService foodSortService;
 
 
-    public List<FoodResponse> getFoods(String keyword, GoalType goalType) {
+    public List<FoodResponse> getFoods(String keyword, GoalType goalType, FoodSortType sortType) {
         List<Food> foods = hasText(keyword)
                 ? foodRepository.findByNameContaining(keyword)
                 : foodRepository.findAll();
+        foods = foodSortService.sort(sortType, foods, goalType);
 
         // 목표가 주어지면 신호등 등급을 함께 계산해 내려준다.
         if (goalType == null) {
