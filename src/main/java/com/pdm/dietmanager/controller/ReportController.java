@@ -9,6 +9,7 @@ import com.pdm.dietmanager.dto.response.WeeklyReportDay;
 import com.pdm.dietmanager.dto.response.WeeklyReportResponse;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.service.CalorieService;
+import com.pdm.dietmanager.service.ExerciseLogService;
 import com.pdm.dietmanager.service.MealLogService;
 import com.pdm.dietmanager.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,7 @@ public class ReportController {
     private final UserProfileService userProfileService;
     private final MealLogService mealLogService;
     private final CalorieService calorieService;
+    private final ExerciseLogService exerciseLogService;
 
     @GetMapping("/daily")
     @Operation(
@@ -60,6 +62,7 @@ public class ReportController {
         CalorieResponse recommendation = calorieService.calculateRecommendation(calorieRequest);
         int intakeCalories = mealLogService.calculateDailyTotalCalories(profileId, date);
         MacroNutrients intakeMacros = mealLogService.calculateDailyIntakeMacros(profileId, date);
+        int burnedCalories = exerciseLogService.calculateDailyBurnedCalories(profileId, date);
 
         return new DailyReportResponse(
                 profileId,
@@ -67,7 +70,8 @@ public class ReportController {
                 recommendation.getRecommendedCalories(),
                 intakeCalories,
                 recommendation.getMacros(),
-                intakeMacros
+                intakeMacros,
+                burnedCalories
         );
     }
 

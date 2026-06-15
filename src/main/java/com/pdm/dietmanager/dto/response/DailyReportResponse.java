@@ -34,13 +34,20 @@ public class DailyReportResponse {
     @Schema(description = "해당 날짜의 실제 섭취 탄단지 그램")
     private final MacroNutrients intakeMacros;
 
+    @Schema(description = "해당 날짜의 총 소모 칼로리(운동)", example = "300")
+    private final int burnedCalories;
+
+    @Schema(description = "순 섭취 칼로리(섭취 - 소모)", example = "300")
+    private final int netCalories;
+
     public DailyReportResponse(
             Long profileId,
             LocalDate date,
             int recommendedCalories,
             int intakeCalories,
             MacroNutrients recommendedMacros,
-            MacroNutrients intakeMacros
+            MacroNutrients intakeMacros,
+            int burnedCalories
     ) {
         this.profileId = profileId;
         this.date = date;
@@ -51,6 +58,8 @@ public class DailyReportResponse {
         this.message = createMessage(this.difference);
         this.recommendedMacros = recommendedMacros;
         this.intakeMacros = intakeMacros;
+        this.burnedCalories = burnedCalories;
+        this.netCalories = intakeCalories - burnedCalories;
     }
 
     private String resolveStatus(int difference) {

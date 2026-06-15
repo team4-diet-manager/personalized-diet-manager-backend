@@ -12,16 +12,19 @@ class DailyReportResponseTest {
 
     @Test
     void intakeBelowRecommendationIsUnder() {
-        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 600, MACROS, INTAKE);
+        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 600, MACROS, INTAKE, 200);
 
         assertThat(report.getDifference()).isEqualTo(-1000);
         assertThat(report.getStatus()).isEqualTo("UNDER");
         assertThat(report.getMessage()).isEqualTo("권장 칼로리보다 1000kcal 적게 섭취했습니다.");
+        // 순 섭취 = 섭취 600 - 소모 200
+        assertThat(report.getBurnedCalories()).isEqualTo(200);
+        assertThat(report.getNetCalories()).isEqualTo(400);
     }
 
     @Test
     void intakeAboveRecommendationIsOver() {
-        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 2000, MACROS, INTAKE);
+        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 2000, MACROS, INTAKE, 0);
 
         assertThat(report.getDifference()).isEqualTo(400);
         assertThat(report.getStatus()).isEqualTo("OVER");
@@ -30,7 +33,7 @@ class DailyReportResponseTest {
 
     @Test
     void intakeEqualToRecommendationIsMatch() {
-        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 1600, MACROS, INTAKE);
+        DailyReportResponse report = new DailyReportResponse(1L, DATE, 1600, 1600, MACROS, INTAKE, 0);
 
         assertThat(report.getDifference()).isZero();
         assertThat(report.getStatus()).isEqualTo("MATCH");
