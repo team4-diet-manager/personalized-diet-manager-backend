@@ -4,6 +4,7 @@ import com.pdm.dietmanager.dto.request.ExerciseLogRequest;
 import com.pdm.dietmanager.dto.response.DailyExerciseLogResponse;
 import com.pdm.dietmanager.dto.response.ErrorResponse;
 import com.pdm.dietmanager.dto.response.ExerciseLogResponse;
+import com.pdm.dietmanager.security.CustomUserDetails;
 import com.pdm.dietmanager.service.ExerciseLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,10 +13,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,8 +51,11 @@ public class ExerciseLogController {
             description = "프로필을 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
-    public ExerciseLogResponse createExerciseLog(@Valid @RequestBody ExerciseLogRequest request) {
-        return exerciseLogService.createExerciseLog(request);
+    public ExerciseLogResponse createExerciseLog(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody ExerciseLogRequest request
+    ) {
+        return exerciseLogService.createExerciseLog(userDetails.getUser(), request);
     }
 
     @GetMapping
@@ -63,12 +67,11 @@ public class ExerciseLogController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     public DailyExerciseLogResponse getExerciseLogs(
-            @RequestParam Long profileId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) Long profileId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        List<ExerciseLogResponse> logs = exerciseLogService.getExerciseLogsByDate(profileId, date);
-        int dailyTotalBurned = exerciseLogService.calculateDailyBurnedCalories(profileId, date);
-        return new DailyExerciseLogResponse(profileId, date, logs, dailyTotalBurned);
+        return exerciseLogService.getDailyExerciseLogs(userDetails.getUser(), date);
     }
 
     @DeleteMapping("/{exerciseLogId}")
@@ -80,7 +83,10 @@ public class ExerciseLogController {
             description = "운동 기록을 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
-    public void deleteExerciseLog(@PathVariable Long exerciseLogId) {
-        exerciseLogService.deleteExerciseLog(exerciseLogId);
+    public void deleteExerciseLog(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long exerciseLogId
+    ) {
+        exerciseLogService.deleteExerciseLog(userDetails.getUser(), exerciseLogId);
     }
 }

@@ -9,6 +9,8 @@ import com.pdm.dietmanager.dto.response.WeightLogResponse;
 import com.pdm.dietmanager.enums.ActivityLevel;
 import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
+import com.pdm.dietmanager.entity.User;
+import com.pdm.dietmanager.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,9 @@ class WeightLogServiceTest {
 
     @Autowired
     private UserProfileService userProfileService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void recordsAndReturnsHistoryInDateOrder() {
@@ -54,7 +59,12 @@ class WeightLogServiceTest {
     }
 
     private Long createProfile() {
-        UserProfileResponse profile = userProfileService.createProfile(UserProfileRequest.of(
+        User user = userRepository.save(User.builder()
+                .email("weight-" + System.nanoTime() + "@example.com")
+                .password("password")
+                .nickname("weight")
+                .build());
+        UserProfileResponse profile = userProfileService.createProfile(user, UserProfileRequest.of(
                 "지현", Gender.FEMALE, 23, 162.0, 55.0, ActivityLevel.NORMAL, GoalType.WEIGHT_LOSS
         ));
         return profile.getProfileId();

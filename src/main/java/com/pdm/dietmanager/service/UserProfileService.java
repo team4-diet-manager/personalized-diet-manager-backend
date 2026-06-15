@@ -6,7 +6,6 @@ import com.pdm.dietmanager.entity.User;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.UserProfileRepository;
-import com.pdm.dietmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,18 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserProfileService {
     private final UserProfileRepository userProfileRepository;
-    private final UserRepository userRepository;
-
-    @Transactional
-    public UserProfileResponse createProfile(UserProfileRequest request) {
-        User dummyUser = User.builder()
-                .email("dummy_" + System.currentTimeMillis() + "@example.com")
-                .password("dummyPass")
-                .nickname("dummyNick")
-                .build();
-        userRepository.save(dummyUser);
-        return createProfile(dummyUser, request);
-    }
 
     @Transactional
     public UserProfileResponse createProfile(User user, UserProfileRequest request) {
@@ -55,15 +42,17 @@ public class UserProfileService {
     }
 
     public UserProfileResponse getProfileByUser(User user) {
-        UserProfile userProfile = userProfileRepository.findByUser(user)
+        return UserProfileResponse.from(findProfileByUser(user));
+    }
+
+    public UserProfile findProfileByUser(User user) {
+        return userProfileRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
-        return UserProfileResponse.from(userProfile);
     }
 
     @Transactional
     public UserProfileResponse updateProfileByUser(User user, UserProfileRequest request) {
-        UserProfile userProfile = userProfileRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        UserProfile userProfile = findProfileByUser(user);
         userProfile.update(
                 request.getName(),
                 request.getGender(),

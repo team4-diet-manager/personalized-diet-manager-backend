@@ -3,6 +3,7 @@ package com.pdm.dietmanager.controller;
 import com.pdm.dietmanager.dto.request.WeightLogRequest;
 import com.pdm.dietmanager.dto.response.ErrorResponse;
 import com.pdm.dietmanager.dto.response.WeightLogResponse;
+import com.pdm.dietmanager.security.CustomUserDetails;
 import com.pdm.dietmanager.service.WeightLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,8 +44,11 @@ public class WeightLogController {
             description = "프로필을 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
-    public WeightLogResponse recordWeight(@Valid @RequestBody WeightLogRequest request) {
-        return weightLogService.recordWeight(request);
+    public WeightLogResponse recordWeight(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody WeightLogRequest request
+    ) {
+        return weightLogService.recordWeight(userDetails.getUser(), request);
     }
 
     @GetMapping
@@ -54,7 +59,10 @@ public class WeightLogController {
             description = "필수 쿼리 파라미터 누락",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
-    public List<WeightLogResponse> getWeightHistory(@RequestParam Long profileId) {
-        return weightLogService.getWeightHistory(profileId);
+    public List<WeightLogResponse> getWeightHistory(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) Long profileId
+    ) {
+        return weightLogService.getWeightHistory(userDetails.getUser());
     }
 }
