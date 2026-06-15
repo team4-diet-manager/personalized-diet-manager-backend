@@ -19,13 +19,13 @@ public class DailyReportResponse {
     @Schema(description = "해당 날짜의 실제 섭취 칼로리", example = "600")
     private final int intakeCalories;
 
-    @Schema(description = "섭취 칼로리 - 권장 칼로리", example = "-995")
+    @Schema(description = "순 섭취 칼로리(섭취 - 운동 소모) - 권장 칼로리", example = "-1295")
     private final int difference;
 
-    @Schema(description = "섭취 상태", example = "UNDER")
+    @Schema(description = "순 섭취 상태", example = "UNDER")
     private final String status;
 
-    @Schema(description = "권장량 대비 섭취량 비교 메시지", example = "권장 칼로리보다 995kcal 적게 섭취했습니다.")
+    @Schema(description = "권장량 대비 순 섭취량 비교 메시지", example = "권장 칼로리보다 1295kcal 적습니다.")
     private final String message;
 
     @Schema(description = "목표별 권장 탄단지 그램")
@@ -53,13 +53,13 @@ public class DailyReportResponse {
         this.date = date;
         this.recommendedCalories = recommendedCalories;
         this.intakeCalories = intakeCalories;
-        this.difference = intakeCalories - recommendedCalories;
+        this.netCalories = intakeCalories - burnedCalories;
+        this.difference = this.netCalories - recommendedCalories;
         this.status = resolveStatus(this.difference);
         this.message = createMessage(this.difference);
         this.recommendedMacros = recommendedMacros;
         this.intakeMacros = intakeMacros;
         this.burnedCalories = burnedCalories;
-        this.netCalories = intakeCalories - burnedCalories;
     }
 
     private String resolveStatus(int difference) {
@@ -74,11 +74,11 @@ public class DailyReportResponse {
 
     private String createMessage(int difference) {
         if (difference < 0) {
-            return "권장 칼로리보다 " + Math.abs(difference) + "kcal 적게 섭취했습니다.";
+            return "권장 칼로리보다 " + Math.abs(difference) + "kcal 적습니다.";
         }
         if (difference > 0) {
-            return "권장 칼로리보다 " + difference + "kcal 많이 섭취했습니다.";
+            return "권장 칼로리보다 " + difference + "kcal 많습니다.";
         }
-        return "권장 칼로리와 동일하게 섭취했습니다.";
+        return "권장 칼로리와 동일합니다.";
     }
 }
