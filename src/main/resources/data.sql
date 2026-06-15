@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
 
 CREATE TABLE IF NOT EXISTS food (
     food_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
     calories INT NOT NULL,
     serving_size VARCHAR(50) NOT NULL,
     protein_grams INT NOT NULL,
@@ -71,8 +71,8 @@ CREATE TABLE IF NOT EXISTS weight_log (
     FOREIGN KEY (profile_id) REFERENCES user_profile(profile_id) ON DELETE CASCADE
 );
 
--- 초기 데이터 삽입
-INSERT INTO food (name, calories, serving_size, protein_grams, carb_grams, fat_grams, sugar_grams, sodium_mg, saturated_fat_grams, fiber_grams, created_at) VALUES
+-- 초기 데이터 삽입 (이미 존재하는 음식명은 건너뜀 → 재시작 시 중복 방지)
+INSERT IGNORE INTO food (name, calories, serving_size, protein_grams, carb_grams, fat_grams, sugar_grams, sodium_mg, saturated_fat_grams, fiber_grams, created_at) VALUES
 ('닭가슴살', 165, '100g', 31, 0, 4, 0, 60, 1, 0, CURRENT_TIMESTAMP),
 ('고구마', 130, '1개', 2, 30, 0, 9, 40, 0, 4, CURRENT_TIMESTAMP),
 ('현미밥', 300, '1공기', 6, 65, 2, 0, 5, 0, 3, CURRENT_TIMESTAMP),
