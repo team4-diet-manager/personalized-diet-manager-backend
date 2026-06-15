@@ -55,6 +55,7 @@ class MealLogServiceTest {
 
     private UserProfileResponse createProfile() {
         return userProfileService.createProfile(UserProfileRequest.of(
+                "지현",
                 Gender.FEMALE,
                 23,
                 162.0,

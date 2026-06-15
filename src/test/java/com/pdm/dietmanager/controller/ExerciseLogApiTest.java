@@ -31,7 +31,7 @@ class ExerciseLogApiTest {
 
     private Long createProfile() {
         return userProfileService.createProfile(UserProfileRequest.of(
-                Gender.MALE, 30, 175.0, 60.0, ActivityLevel.NORMAL, GoalType.MAINTAIN
+                "민준", Gender.MALE, 30, 175.0, 60.0, ActivityLevel.NORMAL, GoalType.MAINTAIN
         )).getProfileId();
     }
 

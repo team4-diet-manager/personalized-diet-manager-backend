@@ -21,6 +21,7 @@ class UserProfileServiceTest {
     @Test
     void createAndGetProfile() {
         UserProfileRequest request = UserProfileRequest.of(
+                "지현",
                 Gender.FEMALE,
                 23,
                 162.0,
@@ -33,6 +34,7 @@ class UserProfileServiceTest {
         UserProfileResponse foundProfile = userProfileService.getProfile(createdProfile.getProfileId());
 
         assertThat(foundProfile.getProfileId()).isEqualTo(createdProfile.getProfileId());
+        assertThat(foundProfile.getName()).isEqualTo("지현");
         assertThat(foundProfile.getGender()).isEqualTo(Gender.FEMALE);
         assertThat(foundProfile.getGoalType()).isEqualTo(GoalType.WEIGHT_LOSS);
     }
@@ -40,6 +42,7 @@ class UserProfileServiceTest {
     @Test
     void updateProfileReflectsAllFieldsIncludingGender() {
         UserProfileResponse created = userProfileService.createProfile(UserProfileRequest.of(
+                "지현",
                 Gender.FEMALE,
                 23,
                 162.0,
@@ -51,6 +54,7 @@ class UserProfileServiceTest {
         UserProfileResponse updated = userProfileService.updateProfile(
                 created.getProfileId(),
                 UserProfileRequest.of(
+                        "민준",
                         Gender.MALE,
                         30,
                         178.0,
@@ -60,8 +64,9 @@ class UserProfileServiceTest {
                 )
         );
 
-        // 수정 시 성별을 포함한 모든 필드가 반영되어야 한다(과거 gender 누락 버그 회귀 방지).
+        // 수정 시 이름·성별을 포함한 모든 필드가 반영되어야 한다(과거 gender 누락 버그 회귀 방지).
         assertThat(updated.getProfileId()).isEqualTo(created.getProfileId());
+        assertThat(updated.getName()).isEqualTo("민준");
         assertThat(updated.getGender()).isEqualTo(Gender.MALE);
         assertThat(updated.getAge()).isEqualTo(30);
         assertThat(updated.getHeight()).isEqualTo(178.0);

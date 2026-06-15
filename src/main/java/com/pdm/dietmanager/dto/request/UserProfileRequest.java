@@ -5,13 +5,20 @@ import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
 @Schema(description = "사용자 신체 정보 및 목표 등록 요청")
 public class UserProfileRequest {
+    @Schema(description = "이름", example = "임지현")
+    @NotBlank(message = "이름은 필수 입력값입니다.")
+    @Size(max = 50, message = "이름은 50자 이하여야 합니다.")
+    private String name;
+
     @Schema(description = "성별", example = "FEMALE")
     @NotNull(message = "성별은 필수 입력값입니다.")
     private Gender gender;
@@ -36,9 +43,10 @@ public class UserProfileRequest {
     @NotNull(message = "목표는 필수 입력값입니다.")
     private GoalType goalType;
 
-    public static UserProfileRequest of(Gender gender, int age, double height, double weight,
-                                        ActivityLevel activityLevel, GoalType goalType) {
+    public static UserProfileRequest of(String name, Gender gender, int age, double height,
+                                        double weight, ActivityLevel activityLevel, GoalType goalType) {
         UserProfileRequest request = new UserProfileRequest();
+        request.name = name;
         request.gender = gender;
         request.age = age;
         request.height = height;

@@ -33,6 +33,7 @@ class DailyReportFlowTest {
     @Test
     void calculateRecommendationAndDailyIntakeGap() {
         UserProfileResponse profile = userProfileService.createProfile(UserProfileRequest.of(
+                "지현",
                 Gender.FEMALE,
                 23,
                 162.0,

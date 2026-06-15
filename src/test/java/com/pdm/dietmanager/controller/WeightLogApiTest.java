@@ -31,7 +31,7 @@ class WeightLogApiTest {
 
     private Long createProfile() {
         return userProfileService.createProfile(UserProfileRequest.of(
-                Gender.FEMALE, 23, 162.0, 55.0, ActivityLevel.NORMAL, GoalType.WEIGHT_LOSS
+                "지현", Gender.FEMALE, 23, 162.0, 55.0, ActivityLevel.NORMAL, GoalType.WEIGHT_LOSS
         )).getProfileId();
     }
 

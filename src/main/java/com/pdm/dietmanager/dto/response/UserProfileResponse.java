@@ -13,6 +13,9 @@ public class UserProfileResponse {
     @Schema(description = "사용자 프로필 ID", example = "1")
     private final Long profileId;
 
+    @Schema(description = "이름", example = "임지현")
+    private final String name;
+
     @Schema(description = "성별", example = "FEMALE")
     private final Gender gender;
 
@@ -33,6 +36,7 @@ public class UserProfileResponse {
 
     private UserProfileResponse(UserProfile userProfile) {
         this.profileId = userProfile.getProfileId();
+        this.name = userProfile.getName();
         this.gender = userProfile.getGender();
         this.age = userProfile.getAge();
         this.height = userProfile.getHeight();

@@ -18,6 +18,7 @@ public class UserProfileService {
     @Transactional
     public UserProfileResponse createProfile(UserProfileRequest request) {
         UserProfile userProfile = UserProfile.builder()
+                .name(request.getName())
                 .gender(request.getGender())
                 .age(request.getAge())
                 .height(request.getHeight())
@@ -38,6 +39,7 @@ public class UserProfileService {
     public UserProfileResponse updateProfile(Long profileId, UserProfileRequest request) {
         UserProfile userProfile = findProfile(profileId);
         userProfile.update(
+                request.getName(),
                 request.getGender(),
                 request.getAge(),
                 request.getHeight(),

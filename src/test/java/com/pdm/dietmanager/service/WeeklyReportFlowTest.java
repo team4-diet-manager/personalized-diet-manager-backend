@@ -30,7 +30,7 @@ class WeeklyReportFlowTest {
     @Test
     void aggregatesIntakePerDayOverSevenDays() {
         UserProfileResponse profile = userProfileService.createProfile(UserProfileRequest.of(
-                Gender.FEMALE, 23, 162.0, 55.0, ActivityLevel.NORMAL, GoalType.WEIGHT_LOSS
+                "지현", Gender.FEMALE, 23, 162.0, 55.0, ActivityLevel.NORMAL, GoalType.WEIGHT_LOSS
         ));
         LocalDate end = LocalDate.of(2026, 6, 15);
 

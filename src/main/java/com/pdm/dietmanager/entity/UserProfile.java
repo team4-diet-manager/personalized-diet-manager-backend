@@ -23,6 +23,9 @@ public class UserProfile {
     @Column(name = "profile_id")
     private Long profileId;
 
+    @Column(name = "name", nullable = false, length = 50)
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false, length = 10)
     private Gender gender;
@@ -51,8 +54,9 @@ public class UserProfile {
     private List<MealLog> mealLogs = new ArrayList<>();
 
     @Builder
-    private UserProfile(Gender gender, int age, double height, double weight,
+    private UserProfile(String name, Gender gender, int age, double height, double weight,
                         ActivityLevel activityLevel, GoalType goalType) {
+        this.name = name;
         this.gender = gender;
         this.age = age;
         this.height = height;
@@ -62,8 +66,9 @@ public class UserProfile {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void update(Gender gender, int age, double height, double weight,
+    public void update(String name, Gender gender, int age, double height, double weight,
                        ActivityLevel activityLevel, GoalType goalType) {
+        this.name = name;
         this.gender = gender;
         this.age = age;
         this.height = height;
