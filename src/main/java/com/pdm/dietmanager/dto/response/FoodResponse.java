@@ -29,6 +29,18 @@ public class FoodResponse {
     @Schema(description = "1회 제공량 기준 지방(g)", example = "4")
     private final int fatGrams;
 
+    @Schema(description = "1회 제공량 기준 당류(g)", example = "0")
+    private final int sugarGrams;
+
+    @Schema(description = "1회 제공량 기준 나트륨(mg)", example = "60")
+    private final int sodiumMg;
+
+    @Schema(description = "1회 제공량 기준 포화지방(g)", example = "1")
+    private final int saturatedFatGrams;
+
+    @Schema(description = "1회 제공량 기준 식이섬유(g)", example = "0")
+    private final int fiberGrams;
+
     @Schema(description = "목표 기준 음식 적합도 신호등 등급(목표 미지정 시 null)", example = "GREEN")
     private final FoodGrade grade;
 
@@ -40,6 +52,10 @@ public class FoodResponse {
         this.proteinGrams = food.getProteinGrams();
         this.carbGrams = food.getCarbGrams();
         this.fatGrams = food.getFatGrams();
+        this.sugarGrams = food.getSugarGrams();
+        this.sodiumMg = food.getSodiumMg();
+        this.saturatedFatGrams = food.getSaturatedFatGrams();
+        this.fiberGrams = food.getFiberGrams();
         this.grade = grade;
     }
 
