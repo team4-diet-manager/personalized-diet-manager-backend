@@ -12,8 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.pdm.dietmanager.security.CustomUserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,24 +38,27 @@ public class UserProfileController {
             description = "입력값 검증 실패",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
-    public UserProfileResponse createProfile(@Valid @RequestBody UserProfileRequest request) {
-        return userProfileService.createProfile(request);
+    public UserProfileResponse createProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody UserProfileRequest request
+    ) {
+        return userProfileService.createProfile(userDetails.getUser(), request);
     }
 
-    @GetMapping("/{profileId}")
-    @Operation(summary = "사용자 프로필 조회", description = "프로필 ID로 저장된 신체 정보와 목표를 조회한다.")
+    @GetMapping("/me")
+    @Operation(summary = "사용자 프로필 조회", description = "현재 로그인한 사용자의 신체 정보와 목표를 조회한다.")
     @ApiResponse(responseCode = "200", description = "프로필 조회 성공")
     @ApiResponse(
             responseCode = "404",
             description = "프로필을 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
-    public UserProfileResponse getProfile(@PathVariable Long profileId) {
-        return userProfileService.getProfile(profileId);
+    public UserProfileResponse getMyProfile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return userProfileService.getProfileByUser(userDetails.getUser());
     }
 
-    @PutMapping("/{profileId}")
-    @Operation(summary = "사용자 프로필 수정", description = "기존 프로필의 신체 정보, 활동량, 목표를 수정한다.")
+    @PutMapping("/me")
+    @Operation(summary = "사용자 프로필 수정", description = "현재 로그인한 사용자의 신체 정보, 활동량, 목표를 수정한다.")
     @ApiResponse(responseCode = "200", description = "프로필 수정 성공")
     @ApiResponse(
             responseCode = "400",
@@ -67,9 +71,9 @@ public class UserProfileController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     public UserProfileResponse updateProfile(
-            @PathVariable Long profileId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody UserProfileRequest request
     ) {
-        return userProfileService.updateProfile(profileId, request);
+        return userProfileService.updateProfileByUser(userDetails.getUser(), request);
     }
 }

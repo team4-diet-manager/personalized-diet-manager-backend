@@ -9,6 +9,8 @@ import com.pdm.dietmanager.enums.ActivityLevel;
 import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
 import com.pdm.dietmanager.enums.MealType;
+import com.pdm.dietmanager.entity.User;
+import com.pdm.dietmanager.repository.UserRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,21 +29,27 @@ class WeeklyReportFlowTest {
     @Autowired
     private MealLogService mealLogService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     void aggregatesIntakePerDayOverSevenDays() {
-        UserProfileResponse profile = userProfileService.createProfile(UserProfileRequest.of(
+        User user = User.builder().email("test@example.com").password("pass").nickname("nick").build();
+        userRepository.save(user);
+
+        UserProfileResponse profile = userProfileService.createProfile(user, UserProfileRequest.of(
                 "지현", Gender.FEMALE, 23, 162.0, 55.0, ActivityLevel.NORMAL, GoalType.WEIGHT_LOSS
         ));
         LocalDate end = LocalDate.of(2026, 6, 15);
 
         // 마지막 날(오늘)에 닭가슴살(165kcal) 2개 = 330kcal, 그 외 날짜는 0.
-        mealLogService.createMealLog(MealLogRequest.of(
+        mealLogService.createMealLog(user, MealLogRequest.of(
                 profile.getProfileId(), end, MealType.LUNCH, 1L, 2
         ));
 
-        int todayIntake = mealLogService.calculateDailyTotalCalories(profile.getProfileId(), end);
+        int todayIntake = mealLogService.calculateDailyTotalCalories(user, end);
         int yesterdayIntake = mealLogService.calculateDailyTotalCalories(
-                profile.getProfileId(), end.minusDays(1)
+                user, end.minusDays(1)
         );
 
         assertThat(todayIntake).isEqualTo(330);

@@ -7,7 +7,9 @@ import com.pdm.dietmanager.dto.request.MealLogRequest;
 import com.pdm.dietmanager.dto.request.UserProfileRequest;
 import com.pdm.dietmanager.dto.response.MacroNutrients;
 import com.pdm.dietmanager.dto.response.UserProfileResponse;
+import com.pdm.dietmanager.entity.User;
 import com.pdm.dietmanager.entity.UserProfile;
+import com.pdm.dietmanager.repository.UserRepository;
 import com.pdm.dietmanager.enums.ActivityLevel;
 import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
@@ -30,9 +32,15 @@ class DailyReportFlowTest {
     @Autowired
     private CalorieService calorieService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     void calculateRecommendationAndDailyIntakeGap() {
-        UserProfileResponse profile = userProfileService.createProfile(UserProfileRequest.of(
+        User user = User.builder().email("report@example.com").password("pass").nickname("nick").build();
+        userRepository.save(user);
+
+        UserProfileResponse profile = userProfileService.createProfile(user, UserProfileRequest.of(
                 "지현",
                 Gender.FEMALE,
                 23,
@@ -43,7 +51,7 @@ class DailyReportFlowTest {
         ));
         LocalDate mealDate = LocalDate.of(2026, 6, 9);
 
-        mealLogService.createMealLog(MealLogRequest.of(
+        mealLogService.createMealLog(user, MealLogRequest.of(
                 profile.getProfileId(),
                 mealDate,
                 MealType.LUNCH,
@@ -56,11 +64,11 @@ class DailyReportFlowTest {
                 CalorieRequest.from(userProfile)
         ).getRecommendedCalories();
         int dailyTotalCalories = mealLogService.calculateDailyTotalCalories(
-                profile.getProfileId(),
+                user,
                 mealDate
         );
         MacroNutrients intakeMacros = mealLogService.calculateDailyIntakeMacros(
-                profile.getProfileId(),
+                user,
                 mealDate
         );
 

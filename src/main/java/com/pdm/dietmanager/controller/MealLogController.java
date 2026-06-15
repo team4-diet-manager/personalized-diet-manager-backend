@@ -16,6 +16,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.pdm.dietmanager.security.CustomUserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,12 +50,15 @@ public class MealLogController {
             description = "프로필 또는 음식을 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
-    public MealLogResponse createMealLog(@Valid @RequestBody MealLogRequest request) {
-        return mealLogService.createMealLog(request);
+    public MealLogResponse createMealLog(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody MealLogRequest request
+    ) {
+        return mealLogService.createMealLog(userDetails.getUser(), request);
     }
 
     @GetMapping
-    @Operation(summary = "날짜별 식단 기록 조회", description = "특정 사용자의 특정 날짜 식단 기록과 총 섭취 칼로리를 조회한다.")
+    @Operation(summary = "날짜별 식단 기록 조회", description = "현재 로그인한 사용자의 특정 날짜 식단 기록과 총 섭취 칼로리를 조회한다.")
     @ApiResponse(responseCode = "200", description = "날짜별 식단 기록 조회 성공")
     @ApiResponse(
             responseCode = "400",
@@ -61,12 +66,10 @@ public class MealLogController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     public DailyMealLogResponse getMealLogs(
-            @RequestParam Long profileId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        List<MealLogResponse> mealLogs = mealLogService.getMealLogsByDate(profileId, date);
-        int dailyTotalCalories = mealLogService.calculateDailyTotalCalories(profileId, date);
-        return new DailyMealLogResponse(profileId, date, mealLogs, dailyTotalCalories);
+        return mealLogService.getDailyMealLogs(userDetails.getUser(), date);
     }
 
     @PutMapping("/{mealLogId}")
@@ -83,10 +86,11 @@ public class MealLogController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     public MealLogResponse updateMealLog(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long mealLogId,
             @Valid @RequestBody MealLogRequest request
     ) {
-        return mealLogService.updateMealLog(mealLogId, request);
+        return mealLogService.updateMealLog(userDetails.getUser(), mealLogId, request);
     }
 
     @DeleteMapping("/{mealLogId}")
@@ -98,7 +102,10 @@ public class MealLogController {
             description = "식단 기록을 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
-    public void deleteMealLog(@PathVariable Long mealLogId) {
-        mealLogService.deleteMealLog(mealLogId);
+    public void deleteMealLog(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long mealLogId
+    ) {
+        mealLogService.deleteMealLog(userDetails.getUser(), mealLogId);
     }
 }

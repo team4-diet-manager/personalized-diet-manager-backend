@@ -23,6 +23,10 @@ public class UserProfile {
     @Column(name = "profile_id")
     private Long profileId;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
+
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
@@ -54,8 +58,9 @@ public class UserProfile {
     private List<MealLog> mealLogs = new ArrayList<>();
 
     @Builder
-    private UserProfile(String name, Gender gender, int age, double height, double weight,
+    private UserProfile(User user, String name, Gender gender, int age, double height, double weight,
                         ActivityLevel activityLevel, GoalType goalType) {
+        this.user = user;
         this.name = name;
         this.gender = gender;
         this.age = age;

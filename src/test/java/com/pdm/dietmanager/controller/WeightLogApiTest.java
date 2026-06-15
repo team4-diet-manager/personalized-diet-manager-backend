@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * 체중 기록 엔드포인트 웹 계층 검증(200/400/404, 같은 날짜 upsert).
  */
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class WeightLogApiTest {
     @Autowired
     private MockMvc mockMvc;

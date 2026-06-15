@@ -12,6 +12,8 @@ import com.pdm.dietmanager.enums.GoalType;
 import com.pdm.dietmanager.enums.MealType;
 import java.time.LocalDate;
 import java.util.List;
+import com.pdm.dietmanager.entity.User;
+import com.pdm.dietmanager.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,9 +28,15 @@ class MealLogServiceTest {
     @Autowired
     private MealLogService mealLogService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     void createMealLogAndCalculateDailyTotalCalories() {
-        UserProfileResponse profile = createProfile();
+        User user = User.builder().email("meal@example.com").password("pass").nickname("nick").build();
+        userRepository.save(user);
+
+        UserProfileResponse profile = createProfile(user);
         LocalDate mealDate = LocalDate.of(2026, 6, 9);
         MealLogRequest request = MealLogRequest.of(
                 profile.getProfileId(),
@@ -38,13 +46,13 @@ class MealLogServiceTest {
                 2
         );
 
-        MealLogResponse createdMealLog = mealLogService.createMealLog(request);
+        MealLogResponse createdMealLog = mealLogService.createMealLog(user, request);
         List<MealLogResponse> mealLogs = mealLogService.getMealLogsByDate(
-                profile.getProfileId(),
+                user,
                 mealDate
         );
         int dailyTotalCalories = mealLogService.calculateDailyTotalCalories(
-                profile.getProfileId(),
+                user,
                 mealDate
         );
 
@@ -53,8 +61,8 @@ class MealLogServiceTest {
         assertThat(dailyTotalCalories).isEqualTo(330);
     }
 
-    private UserProfileResponse createProfile() {
-        return userProfileService.createProfile(UserProfileRequest.of(
+    private UserProfileResponse createProfile(User user) {
+        return userProfileService.createProfile(user, UserProfileRequest.of(
                 "지현",
                 Gender.FEMALE,
                 23,

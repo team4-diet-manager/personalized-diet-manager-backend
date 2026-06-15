@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.pdm.dietmanager.dto.request.UserProfileRequest;
 import com.pdm.dietmanager.dto.response.UserProfileResponse;
+import com.pdm.dietmanager.entity.User;
+import com.pdm.dietmanager.repository.UserRepository;
 import com.pdm.dietmanager.enums.ActivityLevel;
 import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
@@ -18,8 +20,14 @@ class UserProfileServiceTest {
     @Autowired
     private UserProfileService userProfileService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     void createAndGetProfile() {
+        User user = User.builder().email("test@example.com").password("pass").nickname("nick").build();
+        userRepository.save(user);
+
         UserProfileRequest request = UserProfileRequest.of(
                 "지현",
                 Gender.FEMALE,
@@ -30,8 +38,8 @@ class UserProfileServiceTest {
                 GoalType.WEIGHT_LOSS
         );
 
-        UserProfileResponse createdProfile = userProfileService.createProfile(request);
-        UserProfileResponse foundProfile = userProfileService.getProfile(createdProfile.getProfileId());
+        UserProfileResponse createdProfile = userProfileService.createProfile(user, request);
+        UserProfileResponse foundProfile = userProfileService.getProfileByUser(user);
 
         assertThat(foundProfile.getProfileId()).isEqualTo(createdProfile.getProfileId());
         assertThat(foundProfile.getName()).isEqualTo("지현");
@@ -41,7 +49,10 @@ class UserProfileServiceTest {
 
     @Test
     void updateProfileReflectsAllFieldsIncludingGender() {
-        UserProfileResponse created = userProfileService.createProfile(UserProfileRequest.of(
+        User user = User.builder().email("update@example.com").password("pass").nickname("nick").build();
+        userRepository.save(user);
+
+        UserProfileResponse created = userProfileService.createProfile(user, UserProfileRequest.of(
                 "지현",
                 Gender.FEMALE,
                 23,
@@ -51,8 +62,8 @@ class UserProfileServiceTest {
                 GoalType.WEIGHT_LOSS
         ));
 
-        UserProfileResponse updated = userProfileService.updateProfile(
-                created.getProfileId(),
+        UserProfileResponse updated = userProfileService.updateProfileByUser(
+                user,
                 UserProfileRequest.of(
                         "민준",
                         Gender.MALE,

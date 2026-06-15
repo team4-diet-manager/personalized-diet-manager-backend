@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * 음식 조회/신호등 분류 엔드포인트 웹 계층 검증.
  */
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class FoodApiTest {
     @Autowired
     private MockMvc mockMvc;

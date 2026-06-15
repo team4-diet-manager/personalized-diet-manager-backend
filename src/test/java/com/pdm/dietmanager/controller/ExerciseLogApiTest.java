@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * 운동 기록 엔드포인트 웹 계층 검증(201/200/400/404)과 소모 칼로리 계산 반영.
  */
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class ExerciseLogApiTest {
     @Autowired
     private MockMvc mockMvc;

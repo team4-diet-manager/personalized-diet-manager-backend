@@ -1,10 +1,12 @@
 package com.pdm.dietmanager.service;
 
 import com.pdm.dietmanager.dto.request.MealLogRequest;
+import com.pdm.dietmanager.dto.response.DailyMealLogResponse;
 import com.pdm.dietmanager.dto.response.MacroNutrients;
 import com.pdm.dietmanager.dto.response.MealLogResponse;
 import com.pdm.dietmanager.entity.Food;
 import com.pdm.dietmanager.entity.MealLog;
+import com.pdm.dietmanager.entity.User;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.FoodRepository;
@@ -41,8 +43,28 @@ public class MealLogService {
         return MealLogResponse.from(savedMealLog);
     }
 
-    public List<MealLogResponse> getMealLogsByDate(Long profileId, LocalDate mealDate) {
-        return mealLogRepository.findByUserProfile_ProfileIdAndMealDate(profileId, mealDate)
+    @Transactional
+    public MealLogResponse createMealLog(User user, MealLogRequest request) {
+        UserProfile userProfile = userProfileRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        Food food = findFood(request.getFoodId());
+
+        MealLog mealLog = MealLog.builder()
+                .userProfile(userProfile)
+                .food(food)
+                .mealDate(request.getMealDate())
+                .mealType(request.getMealType())
+                .quantity(request.getQuantity())
+                .build();
+
+        MealLog savedMealLog = mealLogRepository.save(mealLog);
+        return MealLogResponse.from(savedMealLog);
+    }
+
+    public List<MealLogResponse> getMealLogsByDate(User user, LocalDate mealDate) {
+        UserProfile userProfile = userProfileRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        return mealLogRepository.findByUserProfile_ProfileIdAndMealDate(userProfile.getProfileId(), mealDate)
                 .stream()
                 .map(MealLogResponse::from)
                 .toList();
@@ -53,12 +75,32 @@ public class MealLogService {
         return mealLogRepository.findDistinctMealDatesBetween(profileId, startDate, endDate);
     }
 
+    public DailyMealLogResponse getDailyMealLogs(User user, LocalDate mealDate) {
+        UserProfile userProfile = userProfileRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        List<MealLogResponse> mealLogs = mealLogRepository.findByUserProfile_ProfileIdAndMealDate(userProfile.getProfileId(), mealDate)
+                .stream()
+                .map(MealLogResponse::from)
+                .toList();
+        Long totalCalories = mealLogRepository.sumTotalCaloriesByProfileIdAndMealDate(
+                userProfile.getProfileId(),
+                mealDate
+        );
+        return new DailyMealLogResponse(userProfile.getProfileId(), mealDate, mealLogs, totalCalories.intValue());
+    }
+
     public int calculateDailyTotalCalories(Long profileId, LocalDate mealDate) {
         Long totalCalories = mealLogRepository.sumTotalCaloriesByProfileIdAndMealDate(
                 profileId,
                 mealDate
         );
         return totalCalories.intValue();
+    }
+
+    public int calculateDailyTotalCalories(User user, LocalDate mealDate) {
+        UserProfile userProfile = userProfileRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        return calculateDailyTotalCalories(userProfile.getProfileId(), mealDate);
     }
 
     /**
@@ -84,9 +126,18 @@ public class MealLogService {
         return new MacroNutrients(protein, carb, fat);
     }
 
+    public MacroNutrients calculateDailyIntakeMacros(User user, LocalDate mealDate) {
+        UserProfile userProfile = userProfileRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        return calculateDailyIntakeMacros(userProfile.getProfileId(), mealDate);
+    }
+
     @Transactional
-    public MealLogResponse updateMealLog(Long mealLogId, MealLogRequest request) {
+    public MealLogResponse updateMealLog(User user, Long mealLogId, MealLogRequest request) {
         MealLog mealLog = findMealLog(mealLogId);
+        if (!mealLog.getUserProfile().getUser().getUserId().equals(user.getUserId())) {
+            throw new IllegalArgumentException("해당 기록을 수정할 권한이 없습니다.");
+        }
         Food food = findFood(request.getFoodId());
 
         mealLog.update(food, request.getQuantity(), request.getMealType());
@@ -94,8 +145,11 @@ public class MealLogService {
     }
 
     @Transactional
-    public void deleteMealLog(Long mealLogId) {
+    public void deleteMealLog(User user, Long mealLogId) {
         MealLog mealLog = findMealLog(mealLogId);
+        if (!mealLog.getUserProfile().getUser().getUserId().equals(user.getUserId())) {
+            throw new IllegalArgumentException("해당 기록을 삭제할 권한이 없습니다.");
+        }
         mealLogRepository.delete(mealLog);
     }
 
