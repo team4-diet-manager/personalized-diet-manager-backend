@@ -1,29 +1,18 @@
 package com.pdm.dietmanager.controller;
 
-import com.pdm.dietmanager.dto.request.CalorieRequest;
-import com.pdm.dietmanager.dto.response.CalorieResponse;
 import com.pdm.dietmanager.dto.response.DailyReportResponse;
 import com.pdm.dietmanager.dto.response.ErrorResponse;
-import com.pdm.dietmanager.dto.response.MacroNutrients;
 import com.pdm.dietmanager.dto.response.StatsResponse;
-import com.pdm.dietmanager.dto.response.WeeklyReportDay;
 import com.pdm.dietmanager.dto.response.WeeklyReportResponse;
-import com.pdm.dietmanager.entity.UserProfile;
-import com.pdm.dietmanager.service.CalorieService;
-import com.pdm.dietmanager.service.ExerciseLogService;
-import com.pdm.dietmanager.service.MealLogService;
-import com.pdm.dietmanager.service.StatsService;
-import com.pdm.dietmanager.service.UserProfileService;
+import com.pdm.dietmanager.security.CustomUserDetails;
+import com.pdm.dietmanager.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import com.pdm.dietmanager.security.CustomUserDetails;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "Report", description = "권장 칼로리와 실제 섭취 칼로리 비교 API")
 public class ReportController {
-    private final UserProfileService userProfileService;
-    private final MealLogService mealLogService;
-    private final CalorieService calorieService;
-    private final ExerciseLogService exerciseLogService;
-    private final StatsService statsService;
+    private final ReportService reportService;
 
     @GetMapping("/daily")
     @Operation(
@@ -62,26 +47,7 @@ public class ReportController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        UserProfile userProfile = userProfileService.findProfile(
-                userProfileService.getProfileByUser(userDetails.getUser()).getProfileId()
-        );
-        Long profileId = userProfile.getProfileId();
-        CalorieRequest calorieRequest = CalorieRequest.from(userProfile);
-        CalorieResponse recommendation = calorieService.calculateRecommendation(calorieRequest);
-
-        int intakeCalories = mealLogService.calculateDailyTotalCalories(profileId, date);
-        MacroNutrients intakeMacros = mealLogService.calculateDailyIntakeMacros(profileId, date);
-        int burnedCalories = exerciseLogService.calculateDailyBurnedCalories(profileId, date);
-
-        return new DailyReportResponse(
-                userProfile.getProfileId(),
-                date,
-                recommendation.getRecommendedCalories(),
-                intakeCalories,
-                recommendation.getMacros(),
-                intakeMacros,
-                burnedCalories
-        );
+        return reportService.getDailyReport(userDetails.getUser(), date);
     }
 
     @GetMapping("/weekly")
@@ -104,22 +70,7 @@ public class ReportController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-        UserProfile userProfile = userProfileService.findProfile(
-                userProfileService.getProfileByUser(userDetails.getUser()).getProfileId()
-        );
-        int recommendedCalories = calorieService.calculateRecommendation(
-                CalorieRequest.from(userProfile)
-        ).getRecommendedCalories();
-        LocalDate end = endDate != null ? endDate : LocalDate.now();
-
-        List<WeeklyReportDay> days = new ArrayList<>();
-        for (int offset = 6; offset >= 0; offset--) {
-            LocalDate day = end.minusDays(offset);
-            int intakeCalories = mealLogService.calculateDailyTotalCalories(userDetails.getUser(), day);
-            days.add(new WeeklyReportDay(day, recommendedCalories, intakeCalories));
-        }
-
-        return new WeeklyReportResponse(userProfile.getProfileId(), days);
+        return reportService.getWeeklyReport(userDetails.getUser(), endDate);
     }
 
     @GetMapping("/stats")
@@ -139,10 +90,10 @@ public class ReportController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))
     )
     public StatsResponse getStats(
-            @RequestParam Long profileId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) Long profileId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-        LocalDate end = endDate != null ? endDate : LocalDate.now();
-        return statsService.getStats(profileId, end);
+        return reportService.getStats(userDetails.getUser(), endDate);
     }
 }

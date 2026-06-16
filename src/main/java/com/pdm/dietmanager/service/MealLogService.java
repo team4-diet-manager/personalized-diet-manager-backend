@@ -11,7 +11,6 @@ import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.exception.ResourceNotFoundException;
 import com.pdm.dietmanager.repository.FoodRepository;
 import com.pdm.dietmanager.repository.MealLogRepository;
-import com.pdm.dietmanager.repository.UserProfileRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,30 +22,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MealLogService {
     private final MealLogRepository mealLogRepository;
-    private final UserProfileRepository userProfileRepository;
+    private final UserProfileService userProfileService;
     private final FoodRepository foodRepository;
 
     @Transactional
     public MealLogResponse createMealLog(MealLogRequest request) {
-        UserProfile userProfile = findProfile(request.getProfileId());
-        Food food = findFood(request.getFoodId());
-
-        MealLog mealLog = MealLog.builder()
-                .userProfile(userProfile)
-                .food(food)
-                .mealDate(request.getMealDate())
-                .mealType(request.getMealType())
-                .quantity(request.getQuantity())
-                .build();
-
-        MealLog savedMealLog = mealLogRepository.save(mealLog);
-        return MealLogResponse.from(savedMealLog);
+        return createMealLog(userProfileService.findProfile(request.getProfileId()), request);
     }
 
     @Transactional
     public MealLogResponse createMealLog(User user, MealLogRequest request) {
-        UserProfile userProfile = userProfileRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        return createMealLog(userProfileService.findProfileByUser(user), request);
+    }
+
+    private MealLogResponse createMealLog(UserProfile userProfile, MealLogRequest request) {
         Food food = findFood(request.getFoodId());
 
         MealLog mealLog = MealLog.builder()
@@ -62,8 +51,7 @@ public class MealLogService {
     }
 
     public List<MealLogResponse> getMealLogsByDate(User user, LocalDate mealDate) {
-        UserProfile userProfile = userProfileRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        UserProfile userProfile = userProfileService.findProfileByUser(user);
         return mealLogRepository.findByUserProfile_ProfileIdAndMealDate(userProfile.getProfileId(), mealDate)
                 .stream()
                 .map(MealLogResponse::from)
@@ -76,8 +64,7 @@ public class MealLogService {
     }
 
     public DailyMealLogResponse getDailyMealLogs(User user, LocalDate mealDate) {
-        UserProfile userProfile = userProfileRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        UserProfile userProfile = userProfileService.findProfileByUser(user);
         List<MealLogResponse> mealLogs = mealLogRepository.findByUserProfile_ProfileIdAndMealDate(userProfile.getProfileId(), mealDate)
                 .stream()
                 .map(MealLogResponse::from)
@@ -98,8 +85,7 @@ public class MealLogService {
     }
 
     public int calculateDailyTotalCalories(User user, LocalDate mealDate) {
-        UserProfile userProfile = userProfileRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        UserProfile userProfile = userProfileService.findProfileByUser(user);
         return calculateDailyTotalCalories(userProfile.getProfileId(), mealDate);
     }
 
@@ -127,8 +113,7 @@ public class MealLogService {
     }
 
     public MacroNutrients calculateDailyIntakeMacros(User user, LocalDate mealDate) {
-        UserProfile userProfile = userProfileRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("프로필이 등록되지 않은 사용자입니다."));
+        UserProfile userProfile = userProfileService.findProfileByUser(user);
         return calculateDailyIntakeMacros(userProfile.getProfileId(), mealDate);
     }
 
@@ -157,13 +142,6 @@ public class MealLogService {
         return mealLogRepository.findById(mealLogId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "식단 기록을 찾을 수 없습니다. mealLogId=" + mealLogId
-                ));
-    }
-
-    private UserProfile findProfile(Long profileId) {
-        return userProfileRepository.findById(profileId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "사용자 프로필을 찾을 수 없습니다. profileId=" + profileId
                 ));
     }
 

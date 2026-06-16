@@ -2,10 +2,9 @@ package com.pdm.dietmanager.service;
 
 import com.pdm.dietmanager.dto.request.WeightLogRequest;
 import com.pdm.dietmanager.dto.response.WeightLogResponse;
+import com.pdm.dietmanager.entity.User;
 import com.pdm.dietmanager.entity.UserProfile;
 import com.pdm.dietmanager.entity.WeightLog;
-import com.pdm.dietmanager.exception.ResourceNotFoundException;
-import com.pdm.dietmanager.repository.UserProfileRepository;
 import com.pdm.dietmanager.repository.WeightLogRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +16,24 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WeightLogService {
     private final WeightLogRepository weightLogRepository;
-    private final UserProfileRepository userProfileRepository;
+    private final UserProfileService userProfileService;
 
     /** 같은 날짜의 기록이 있으면 체중을 갱신하고, 없으면 새로 등록한다(날짜별 1건 유지). */
     @Transactional
     public WeightLogResponse recordWeight(WeightLogRequest request) {
-        UserProfile userProfile = findProfile(request.getProfileId());
+        return recordWeight(userProfileService.findProfile(request.getProfileId()), request);
+    }
+
+    @Transactional
+    public WeightLogResponse recordWeight(User user, WeightLogRequest request) {
+        return recordWeight(userProfileService.findProfileByUser(user), request);
+    }
+
+    private WeightLogResponse recordWeight(UserProfile userProfile, WeightLogRequest request) {
+        Long profileId = userProfile.getProfileId();
 
         WeightLog weightLog = weightLogRepository
-                .findByUserProfile_ProfileIdAndLogDate(request.getProfileId(), request.getLogDate())
+                .findByUserProfile_ProfileIdAndLogDate(profileId, request.getLogDate())
                 .map(existing -> {
                     existing.changeWeight(request.getWeight());
                     return existing;
@@ -46,10 +54,8 @@ public class WeightLogService {
                 .toList();
     }
 
-    private UserProfile findProfile(Long profileId) {
-        return userProfileRepository.findById(profileId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "사용자 프로필을 찾을 수 없습니다. profileId=" + profileId
-                ));
+    public List<WeightLogResponse> getWeightHistory(User user) {
+        UserProfile userProfile = userProfileService.findProfileByUser(user);
+        return getWeightHistory(userProfile.getProfileId());
     }
 }

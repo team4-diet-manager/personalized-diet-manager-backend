@@ -9,6 +9,8 @@ import com.pdm.dietmanager.enums.ActivityLevel;
 import com.pdm.dietmanager.enums.Gender;
 import com.pdm.dietmanager.enums.GoalType;
 import com.pdm.dietmanager.enums.MealType;
+import com.pdm.dietmanager.entity.User;
+import com.pdm.dietmanager.repository.UserRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ class StatsServiceTest {
 
     @Autowired
     private MealLogService mealLogService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void countsConsecutiveLoggedDaysAsStreak() {
@@ -59,7 +64,12 @@ class StatsServiceTest {
     }
 
     private Long createProfile() {
-        return userProfileService.createProfile(UserProfileRequest.of(
+        User user = userRepository.save(User.builder()
+                .email("stats-" + System.nanoTime() + "@example.com")
+                .password("password")
+                .nickname("stats")
+                .build());
+        return userProfileService.createProfile(user, UserProfileRequest.of(
                 "지현", Gender.FEMALE, 23, 162.0, 55.0, ActivityLevel.NORMAL, GoalType.WEIGHT_LOSS
         )).getProfileId();
     }

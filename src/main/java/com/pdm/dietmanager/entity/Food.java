@@ -21,7 +21,7 @@ public class Food {
     @Column(name = "food_id")
     private Long foodId;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 100, unique = true)
     private String name;
 
     @Column(name = "calories", nullable = false)
