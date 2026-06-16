@@ -38,3 +38,5 @@ out/
 
 src/main/resources/application.properties
 *.yml
+# 배포용 설정(시크릿 없이 환경변수만 사용)은 커밋 허용
+!src/main/resources/application-prod.yml
