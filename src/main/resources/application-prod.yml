@@ -1,0 +1,37 @@
+# 배포(prod) 프로파일 — 모든 비밀값은 환경변수로 주입한다. (시크릿을 깃에 넣지 않음)
+# Render 등에서 SPRING_PROFILES_ACTIVE=prod 로 활성화.
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: diet-manager
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: false
+    show-sql: false
+
+  sql:
+    init:
+      # data.sql이 CREATE TABLE IF NOT EXISTS + INSERT IGNORE 라 매 기동에 안전(음식 시드).
+      mode: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+app:
+  # 콤마로 여러 개 지정 가능. 예: https://xxx.vercel.app,http://localhost:5173
+  cors-allowed-origins: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
